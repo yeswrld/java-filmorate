@@ -26,26 +26,21 @@ class UserControllerTest {
     @DisplayName("Добавление пользователя с емайл без @")
     @Test
     void createUserWtihoutDog() {
-        User user = new User("useremail.com", "Login", "Имя"
-                , LocalDate.of(1990, 9, 29));
-        Assertions.assertThrows(ValidationException.class, () -> userController.create(user)
-                , "Исключение, пользователь не прошел валидацию");
+        User user = new User("useremail.com", "Login", "Имя", LocalDate.of(1990, 9, 29));
+        Assertions.assertThrows(ValidationException.class, () -> userController.create(user), "Исключение, пользователь не прошел валидацию");
     }
 
     @DisplayName("Добавление пользователя с логином содержащим пробелы")
     @Test
     void createUserWithIncorrectLogin() {
-        User user = new User("user@email.com", "Log in", "Имя пользователя"
-                , LocalDate.of(1990, 9, 29));
-        Assertions.assertThrows(ValidationException.class, () -> userController.create(user)
-                , "Исключение, пользователь не прошел валидацию");
+        User user = new User("user@email.com", "Log in", "Имя пользователя", LocalDate.of(1990, 9, 29));
+        Assertions.assertThrows(ValidationException.class, () -> userController.create(user), "Исключение, пользователь не прошел валидацию");
     }
 
     @DisplayName("Добавление пользователя с пустым именем.(вместо имени  должен появится логин")
     @Test
     void createFilmWithoutName() {
-        User user = new User("user@email.com", "Login", ""
-                , LocalDate.of(1990, 9, 29));
+        User user = new User("user@email.com", "Login", "", LocalDate.of(1990, 9, 29));
         userController.create(user);
         Assertions.assertEquals("Login", userController.findAll().stream().toList().getFirst().getName());
     }
@@ -54,7 +49,6 @@ class UserControllerTest {
     @Test
     void createFilmNegativeDuration() {
         User user = new User("user@email.com", "Login", "Имя", LocalDate.of(2030, 9, 29));
-        Assertions.assertThrows(ValidationException.class, () -> userController.create(user)
-                , "Исключение, пользователь не прошел валидацию");
+        Assertions.assertThrows(ValidationException.class, () -> userController.create(user), "Исключение, пользователь не прошел валидацию");
     }
 }
