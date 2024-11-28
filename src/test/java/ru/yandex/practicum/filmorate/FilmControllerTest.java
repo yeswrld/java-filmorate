@@ -28,8 +28,7 @@ class FilmControllerTest {
     void createFilmBefore1895() {
         Film film = new Film("Терминатор", "Какой-то фильм",
                 LocalDate.of(1790, 11, 15), 140);
-        Assertions.assertThrows(ValidationException.class, () -> filmController.create(film)
-                , "Исключение, фильм не прошел валидацию");
+        Assertions.assertThrows(ValidationException.class, () -> filmController.create(film), "Исключение, фильм не прошел валидацию");
     }
 
     @DisplayName("Добавление фильма без имени")
@@ -37,8 +36,7 @@ class FilmControllerTest {
     void createFilmWithEmptyName() {
         Film film = new Film(" ", "Какой-то фильм",
                 LocalDate.of(2001, 11, 15), 140);
-        Assertions.assertThrows(ValidationException.class, () -> filmController.create(film)
-                , "Исключение, фильм не прошел валидацию");
+        Assertions.assertThrows(ValidationException.class, () -> filmController.create(film), "Исключение, фильм не прошел валидацию");
     }
 
     @DisplayName("Добавление фильма с описанием длинной больше 200 символов")
@@ -52,8 +50,7 @@ class FilmControllerTest {
                 "Это описание больше 200 символов Это описание больше 200 символов Это описание больше 200 символов " +
                 "Это описание больше 200 символов Это описание больше 200 символов Это описание больше 200 символов ",
                 LocalDate.of(2001, 11, 15), 140);
-        Assertions.assertThrows(ValidationException.class, () -> filmController.create(film)
-                , "Исключение, фильм не прошел валидацию");
+        Assertions.assertThrows(ValidationException.class, () -> filmController.create(film), "Исключение, фильм не прошел валидацию");
     }
 
     @DisplayName("Добавление фильма с отрицательной длительностью")
@@ -61,8 +58,7 @@ class FilmControllerTest {
     void createFilmNegativeDuration() {
         Film film = new Film("Фильм для тестов", "Какой-то фильм",
                 LocalDate.of(2001, 11, 15), -140);
-        Assertions.assertThrows(ValidationException.class, () -> filmController.create(film)
-                , "Исключение, фильм не прошел валидацию");
+        Assertions.assertThrows(ValidationException.class, () -> filmController.create(film), "Исключение, фильм не прошел валидацию");
     }
 
     @DisplayName("Обновление фильма фильма без имени")
@@ -75,8 +71,7 @@ class FilmControllerTest {
         filmController.create(film);
         updatedFilm.setId(1);
         filmController.update(updatedFilm);
-        Assertions.assertEquals("Обновленный фильм для тестов"
-                , filmController.findAll().stream().toList().getFirst().getName());
+        Assertions.assertEquals("Обновленный фильм для тестов", filmController.findAll().stream().toList().getFirst().getName());
     }
 
 }
