@@ -16,7 +16,7 @@ import java.util.Map;
 @RequestMapping("/films")
 public class FilmController {
     private final Map<Integer, Film> films = new HashMap<>();
-    private final LocalDate DAYOFFILMDATE = LocalDate.of(1895, 12, 28);
+    private static final LocalDate DAYOFFILMDATE = LocalDate.of(1895, 12, 28);
 
     @GetMapping
     public Collection<Film> findAll() {
