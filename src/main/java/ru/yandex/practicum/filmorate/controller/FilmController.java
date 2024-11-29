@@ -16,7 +16,7 @@ import java.util.Map;
 @RequestMapping("/films")
 public class FilmController {
     private final Map<Integer, Film> films = new HashMap<>();
-    private final LocalDate DAY_OF_FILM_DATE = LocalDate.of(1895, 12, 28);
+    private final LocalDate DAYOFFILMDATE = LocalDate.of(1895, 12, 28);
 
     @GetMapping
     public Collection<Film> findAll() {
@@ -56,7 +56,7 @@ public class FilmController {
                 log.error("Длина описания фильма больше 200 символов");
                 throw new ValidationException("Длина описания фильма больше 200 символов");
             }
-            if (film.getReleaseDate().isBefore(DAY_OF_FILM_DATE)) {
+            if (film.getReleaseDate().isBefore(DAYOFFILMDATE)) {
                 log.error("Дата релиза фильма до 28 декабря 1895");
                 throw new ValidationException("Дата релиза фильма до 28 декабря 1895");
             }
