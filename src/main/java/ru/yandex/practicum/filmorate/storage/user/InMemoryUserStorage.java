@@ -50,7 +50,7 @@ public class InMemoryUserStorage implements UserStorage {
             }
             user.setId(getNextId());
             users.put(user.getId(), user);
-            log.info("Пользователь с именем " + user.getName() + " и ID = " + user.getId() + " добавлен");
+            log.info("Пользователь с именем {} и ID = {} добавлен", user.getName(), user.getId());
             return user;
         }
         if (users.containsKey(user.getId())) {
@@ -75,7 +75,7 @@ public class InMemoryUserStorage implements UserStorage {
             oldUser.setLogin(user.getLogin());
             oldUser.setName(user.getName());
             oldUser.setBirthday(user.getBirthday());
-            log.info("Пользователь с именем " + oldUser.getName() + " и ID = " + oldUser.getId() + " обновлен");
+            log.info("Пользователь с именем {} и ID = {} обновлен", user.getName(), user.getId());
             return oldUser;
         } else {
             log.error("Пользователь с ID = " + user.getId() + " не найден");

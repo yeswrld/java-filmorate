@@ -13,8 +13,16 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 public class InMemoryFilmStorage implements FilmStorage {
-    private final Map<Integer, Film> films = new HashMap<>();
     protected static final LocalDate DAYOFFILMDATE = LocalDate.of(1895, 12, 28);
+    protected static final Integer FILM_DESCRIPTION_MAXLENGTH = 200;
+    private final Map<Integer, Film> films = new HashMap<>();
+    private Film filmFromStorage;
+    protected static final Comparator<Film> FILM_COMPARATOR = (new Comparator<Film>() {
+        public int compare(Film o1, Film o2) {
+            return o1.getLikes().size() - o2.getLikes().size();
+        }
+    });
+
 
     @Override
     public Optional<Film> findById(int id) {
@@ -33,7 +41,7 @@ public class InMemoryFilmStorage implements FilmStorage {
                 log.error("Название фильма пустое");
                 throw new ValidationException("Название фильма пустое");
             }
-            if (film.getDescription().length() > 200) {
+            if (film.getDescription().length() > FILM_DESCRIPTION_MAXLENGTH) {
                 log.error("Длина описания фильма больше 200 символов");
                 throw new ValidationException("Длина описания фильма больше 200 символов");
             }
@@ -55,7 +63,7 @@ public class InMemoryFilmStorage implements FilmStorage {
             if (film.getName().isBlank()) {
                 log.error("Название фильма пустое");
                 throw new ValidationException("Название фильма пустое");
-            } else if (film.getDescription().length() >= 200) {
+            } else if (film.getDescription().length() >= FILM_DESCRIPTION_MAXLENGTH) {
                 log.error("Длина описания фильма больше 200 символов");
                 throw new ValidationException("Длина описания фильма больше 200 символов");
             } else if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
@@ -79,7 +87,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (films.get(id) == null) {
             throw new NotFoundException("Фильма для лайка нет");
         }
-        Film filmFromStorage = films.get(id);
+        filmFromStorage = films.get(id);
         Set<Integer> likes = new HashSet<>();
         if (filmFromStorage.getLikes() != null) {
             likes = filmFromStorage.getLikes();
@@ -94,7 +102,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (films.get(filmId) == null) {
             throw new NotFoundException("Фильма для удаления лайка нет");
         }
-        Film filmFromStorage = films.get(filmId);
+        filmFromStorage = films.get(filmId);
         if (filmFromStorage.getLikes() != null) {
             filmFromStorage.getLikes().remove(userId);
         }
@@ -105,11 +113,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Collection<Film> findPopularFilm(Integer count) {
         return films.values().stream()
                 .filter(film -> film.getLikes() != null && film.getLikes().size() > 0)
-                .sorted((new Comparator<Film>() {
-                    public int compare(Film o1, Film o2) {
-                        return o1.getLikes().size() - o2.getLikes().size();
-                    }
-                }).reversed())
+                .sorted(FILM_COMPARATOR.reversed())
                 .limit(count)
                 .collect(Collectors.toList());
 
