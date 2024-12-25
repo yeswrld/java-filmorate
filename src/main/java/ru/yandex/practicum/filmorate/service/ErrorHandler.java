@@ -22,4 +22,10 @@ public class ErrorHandler {
     public ErrorResponse handleBadRequest(final NotFoundException e) {
         return new ErrorResponse("Ошибка поиска данных", e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleBadRequest(final Throwable e) {
+        return new ErrorResponse("Внутренняя ошибка сервера", e.getMessage());
+    }
 }
