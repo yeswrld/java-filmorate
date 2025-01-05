@@ -1,3 +1,3 @@
 # java-filmorate
 Template repository for Filmorate project.
-![Диаграмма без названия (1)](https://github.com/user-attachments/assets/d215315b-e157-4f73-b61b-810bd9a17a35)
+![filmrate](https://github.com/user-attachments/assets/0cdf898f-4e59-44e0-872e-0a07eadf2cd5)
