@@ -53,7 +53,15 @@ public class InMemoryFilmStorage implements FilmStorage {
                 log.error("Продолжительность фильма должна быть положительным числом.");
                 throw new ValidationException("Продолжительность фильма должна быть положительным числом.");
             }
-            film.setId(getNextId());
+            if (film.getGenres().isEmpty()) {
+                log.error("Жанр не найден");
+                throw new ValidationException("Жанр не найден");
+            }
+            if (film.getMpa() == null){
+                log.error("MPA не найден");
+                throw new ValidationException("MPA не найден");
+            }
+                film.setId(getNextId());
             films.put(film.getId(), film);
             log.info("Фильм с названием " + film.getName() + " и ID = " + film.getId() + " добавлен");
             return film;
