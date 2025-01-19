@@ -1,8 +1,11 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -11,6 +14,8 @@ import ru.yandex.practicum.filmorate.storage.BaseStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.FilmRowMapper;
 
 import java.util.*;
+
+
 @Slf4j
 @Repository
 public class FilmDbStorageImplementation extends BaseStorage<Film> implements FilmDbStorage {
@@ -26,21 +31,33 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
 
     @Override
     public Optional<Film> findById(Integer id) {
-        String findByIdQ = """
-                SELECT ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA_ID
-                from films
-                JOIN filmorate.MPA m ON f.MPA_ID = m.id
-                """;
-        return findOne(filmRowMapper, findByIdQ, id);
+        String findById = "SELECT ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA_ID FROM FILMS WHERE ID = ?";
+        try {
+            Film result = findOne(filmRowMapper, findById, id);
+            return Optional.ofNullable(result);
+        } catch (EmptyResultDataAccessException ignored) {
+            return Optional.empty();
+        }
     }
+
+/*    @Override
+    public Optional<Film> findById(Integer id) {
+
+        String query = "SELECT * FROM films WHERE id = ?";
+        try {
+            Film result = findOne(filmRowMapper, query, id);
+            return Optional.ofNullable(result);
+        } catch (EmptyResultDataAccessException ignored) {
+            return Optional.empty();
+        }
+
+
+
+    }*/
 
     @Override
     public Collection<Film> findAll() {
-        String findAllQ = """ 
-                SELECT ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA_ID
-                from films f
-                WHERE ID = ?
-                """;
+        String findAllQ = "SELECT ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA_ID from FILMS";
         return findMany(filmRowMapper, findAllQ);
     }
 
@@ -63,9 +80,7 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
 
     @Override
     public Film update(Film newFilm) {
-        String updQ = """
-                UPDATE FILMS SET NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, MPA_ID = ?
-                """;
+        String updQ = "UPDATE FILMS SET NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, MPA_ID = ?";
         jdbc.update(updQ,
                 newFilm.getName(),
                 newFilm.getDescription(),
@@ -107,22 +122,18 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
 
     @Override
     public Collection<Film> findPopularFilms(Integer count) {
-        String popularFilmQ = """
-                 SELECT ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA_ID
-                 FROM FILMS AS F
-                 LEFT OUTER JOIN LIKES AS L ON F.ID = L.FILM_ID
-                 GROUP BY F.ID
-                 ORDER BY COUNT(L.FILM_ID) DESC
-                 LIMIT
-                """ + count;
+        String popularFilmQ = "SELECT ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA_ID FROM FILMS AS F " +
+                   "LEFT OUTER JOIN LIKES AS L ON F.ID = L.FILM_ID " +
+                   "GROUP BY F.ID " +
+                   "ORDER BY COUNT(L.FILM_ID) " +
+                   "DESC " +
+                   "LIMIT " + count;
         return jdbc.query(popularFilmQ, filmRowMapper);
     }
 
 
     private void updateGenres(Film film) {
-        String deleteGenresQ = """
-                DELETE FROM FILMS_GENRES WHERE FILM_ID = ?
-                """;
+        String deleteGenresQ = "DELETE FROM FILMS_GENRES WHERE FILM_ID = ?";
         jdbc.update(deleteGenresQ, film.getId());
         if (film.getGenres() != null && !film.getGenres().isEmpty()) {
             StringBuilder updGenresQ = new StringBuilder("INSERT INTO FILMS_GENRES (FILM_ID, GENRE_ID) VALUES");

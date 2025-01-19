@@ -15,12 +15,12 @@ import java.util.Optional;
 public class BaseStorage<T> {
     protected final JdbcTemplate jdbc;
 
-    protected Optional<T> findOne(RowMapper<T> mapper, String query, Object... params) {
+    protected T findOne(RowMapper<T> mapper, String query, Object... params) {
         try {
             T result = jdbc.queryForObject(query, mapper, params);
-            return Optional.ofNullable(result);
+            return result;
         } catch (EmptyResultDataAccessException ignored) {
-            return Optional.empty();
+            return null;
         }
     }
 

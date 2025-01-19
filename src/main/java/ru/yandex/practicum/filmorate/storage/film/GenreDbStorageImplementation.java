@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.storage.mappers.GenreRowMapper;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -23,7 +24,7 @@ public class GenreDbStorageImplementation implements GenreDbStorage {
         String findAllQ = """
                 SELECT ID,
                 NAME FROM GENRES""";
-        return jdbc.query(findAllQ, new BeanPropertyRowMapper<>(Genre.class));
+        return jdbc.query(findAllQ, new GenreRowMapper());
     }
 
     @Override
@@ -33,27 +34,18 @@ public class GenreDbStorageImplementation implements GenreDbStorage {
                 FROM GENRES
                 WHERE ID = ?
                 """;
-        return jdbc.queryForObject(findByIdQ, new BeanPropertyRowMapper<>(Genre.class), id);
+        return jdbc.queryForObject(findByIdQ, new GenreRowMapper(), id);
     }
 
     @Override
     public boolean genreExist(Integer id) {
-        String existsQ = """
-                SELECT CASE WHEN EXISTS
-                (SELECT * FROM GENRES
-                WHERE ID = ?)
-                WHEN 'TRUE' ELSE 'FALSE' END
-                """;
+        String existsQ = "SELECT CASE WHEN EXISTS (SELECT * FROM GENRES WHERE ID = ?) THEN TRUE ELSE FALSE END";
         return Boolean.TRUE.equals(jdbc.queryForObject(existsQ, Boolean.class, id));
     }
 
     @Override
     public List<Integer> genreIds(Integer id) {
-        String genreIdsQ = """
-                SELECT *
-                FROM FILMS_GENRES
-                WHERE FILM_ID = ?
-                """;
+        String genreIdsQ = "SELECT GENRE_ID FROM FILMS_GENRES WHERE FILM_ID = ? ";
         List<Integer> genresIds = jdbc.queryForList(genreIdsQ, Integer.class, id);
         Collections.sort(genresIds);
         return genresIds;
@@ -61,18 +53,16 @@ public class GenreDbStorageImplementation implements GenreDbStorage {
 
     @Override
     public List<Genre> findFilmGenres(List<Integer> genreIds) {
-        StringBuilder filmGenresQ = new StringBuilder("""
-                SELECT * FROM GENRES
-                WHERE ID IN (")
-                """);
+        StringBuilder filmGenresQ = new StringBuilder("SELECT * FROM GENRES WHERE ID IN (");
+
         for (int i = 0; i < genreIds.size(); i++) {
             filmGenresQ.append(genreIds.get(i));
-            if (i < genreIds.size() - 1){
+            if (i < genreIds.size() - 1) {
                 filmGenresQ.append(", ");
-            }else {
+            } else {
                 filmGenresQ.append(") GROUP BY ID ORDER BY ID");
             }
         }
-        return jdbc.query(filmGenresQ.toString(), new BeanPropertyRowMapper<>(Genre.class));
+        return jdbc.query(filmGenresQ.toString(), new GenreRowMapper());
     }
 }

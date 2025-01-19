@@ -42,7 +42,7 @@ public class GenreService {
         if (!genreIds.isEmpty()){
             genres = genreDbStorage.findFilmGenres(genreIds);
         }
-        log.info("Жанры {}", genres);
+        //log.info("Жанры {}", genres);
         return genres;
     }
 

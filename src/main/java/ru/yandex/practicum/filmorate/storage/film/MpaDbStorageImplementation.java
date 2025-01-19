@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.storage.mappers.MpaRowMapper;
 
 import java.util.Collection;
 
@@ -21,7 +22,7 @@ public class MpaDbStorageImplementation implements MpaDbStorage {
                 SELECT ID, NAME
                 FROM MPA
                 """;
-        return jdbc.query(findAllQ, new BeanPropertyRowMapper<>(Mpa.class));
+        return jdbc.query(findAllQ, new MpaRowMapper());
     }
 
     @Override
@@ -31,7 +32,7 @@ public class MpaDbStorageImplementation implements MpaDbStorage {
                 FROM MPA
                 WHERE ID = ?
                 """;
-        return jdbc.queryForObject(getQ, new BeanPropertyRowMapper<>(Mpa.class), id);
+        return jdbc.queryForObject(getQ, new MpaRowMapper(), id);
     }
 
     @Override
@@ -41,7 +42,7 @@ public class MpaDbStorageImplementation implements MpaDbStorage {
                 FROM MPA
                 WHERE ID = ? 
                 """;
-        return jdbc.queryForObject(findByIdQ, new BeanPropertyRowMapper<>(Mpa.class), id);
+        return jdbc.queryForObject(findByIdQ, new MpaRowMapper(), id);
     }
 
     @Override
