@@ -90,7 +90,8 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
                 newFilm.getId()
         );
         log.info("Фильм в обновлении " + newFilm.toString());
-       // newFilm.getGenres().addAll(genreService.findFilmGenres(newFilm.getId()));
+        newFilm.getGenres().addAll(genreService.findFilmGenres(newFilm.getId()));
+        updateGenres(newFilm);
         return newFilm;
     }
 
