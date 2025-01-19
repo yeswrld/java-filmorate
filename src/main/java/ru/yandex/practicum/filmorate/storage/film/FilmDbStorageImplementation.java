@@ -80,16 +80,17 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
 
     @Override
     public Film update(Film newFilm) {
-        String updQ = "UPDATE FILMS SET NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, MPA_ID = ?";
+        String updQ = "UPDATE FILMS SET NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, MPA_ID = ? WHERE ID = ?";
         jdbc.update(updQ,
                 newFilm.getName(),
                 newFilm.getDescription(),
                 newFilm.getReleaseDate(),
                 newFilm.getDuration(),
-                newFilm.getMpa(),
+                newFilm.getMpa().getId(),
                 newFilm.getId()
         );
-        newFilm.getGenres().addAll(genreService.findFilmGenres(newFilm.getId()));
+        log.info("Фильм в обновлении " + newFilm.toString());
+       // newFilm.getGenres().addAll(genreService.findFilmGenres(newFilm.getId()));
         return newFilm;
     }
 
