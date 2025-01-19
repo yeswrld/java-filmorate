@@ -1,9 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -12,6 +9,7 @@ import java.util.Set;
 
 
 @Data
+@EqualsAndHashCode
 public class Film {
     private Integer id;
     private String name;

@@ -1,6 +1,5 @@
-package ru.yandex.practicum.filmorate.storage.film;
+package ru.yandex.practicum.filmorate.storage.Genre;
 
-import org.springframework.data.relational.core.sql.In;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.Collection;

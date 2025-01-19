@@ -4,8 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.film.GenreDbStorage;
+import ru.yandex.practicum.filmorate.storage.Genre.GenreDbStorage;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,7 +33,7 @@ public class GenreService {
     public void genreCheck(Integer id){
         if (!genreDbStorage.genreExist(id)){
             log.warn("Жанр с id={} не найден", id);
-            throw new NotFoundException("Жанр не найден");
+            throw new ValidationException("Жанр не найден");
         }
     }
 

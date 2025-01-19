@@ -36,16 +36,20 @@ public class FilmController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Film create(@RequestBody Film film) {
-        filmService.addOrUpdateFilm(film);
+        filmService.addFilm(film);
         return film;
     }
 
     @PutMapping
     public Film update(@RequestBody Film film) {
-        filmService.addOrUpdateFilm(film);
+        filmService.update(film);
         return film;
     }
 
+    @DeleteMapping("/{id}")
+    public void deleteFilm(@PathVariable Integer id){
+        filmService.deleteFilm(id);
+    }
 //    @PutMapping("/{id}/like/{userId}")
 //    public void addLike(@PathVariable Integer id,
 //                        @PathVariable Integer userId) {

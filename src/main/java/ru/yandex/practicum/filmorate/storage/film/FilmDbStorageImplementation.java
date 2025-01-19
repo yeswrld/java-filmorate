@@ -1,11 +1,9 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -18,6 +16,7 @@ import java.util.*;
 
 @Slf4j
 @Repository
+
 public class FilmDbStorageImplementation extends BaseStorage<Film> implements FilmDbStorage {
     private final FilmRowMapper filmRowMapper;
     private final GenreService genreService;
@@ -40,20 +39,6 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
         }
     }
 
-/*    @Override
-    public Optional<Film> findById(Integer id) {
-
-        String query = "SELECT * FROM films WHERE id = ?";
-        try {
-            Film result = findOne(filmRowMapper, query, id);
-            return Optional.ofNullable(result);
-        } catch (EmptyResultDataAccessException ignored) {
-            return Optional.empty();
-        }
-
-
-
-    }*/
 
     @Override
     public Collection<Film> findAll() {
@@ -89,19 +74,13 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
                 newFilm.getMpa().getId(),
                 newFilm.getId()
         );
-        log.info("Фильм в обновлении " + newFilm.toString());
-        newFilm.getGenres().addAll(genreService.findFilmGenres(newFilm.getId()));
         updateGenres(newFilm);
         return newFilm;
     }
 
     @Override
     public void removeById(Integer id) {
-        String removeQ = """
-                    DELETE
-                    FROM FILMS
-                    WHERE ID = ?
-                """;
+        String removeQ = "DELETE FROM FILMS_GENRES WHERE ID = ?";
         jdbc.update(removeQ, id);
     }
 
@@ -125,11 +104,11 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
     @Override
     public Collection<Film> findPopularFilms(Integer count) {
         String popularFilmQ = "SELECT ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA_ID FROM FILMS AS F " +
-                   "LEFT OUTER JOIN LIKES AS L ON F.ID = L.FILM_ID " +
-                   "GROUP BY F.ID " +
-                   "ORDER BY COUNT(L.FILM_ID) " +
-                   "DESC " +
-                   "LIMIT " + count;
+                "LEFT OUTER JOIN LIKES AS L ON F.ID = L.FILM_ID " +
+                "GROUP BY F.ID " +
+                "ORDER BY COUNT(L.FILM_ID) " +
+                "DESC " +
+                "LIMIT " + count;
         return jdbc.query(popularFilmQ, filmRowMapper);
     }
 
