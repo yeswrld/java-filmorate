@@ -44,3 +44,12 @@ user_id INTEGER REFERENCES users(id),
 film_id INTEGER REFERENCES films(id)
 );
 
+CREATE TABLE IF NOT EXISTS friends
+(
+user_id int REFERENCES USERS (id),
+friend_id INTEGER REFERENCES USERS (id),
+confirmed BOOLEAN
+);
+
+
+

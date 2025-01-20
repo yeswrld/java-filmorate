@@ -8,7 +8,7 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.Genre.GenreDbStorage;
-import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.Films.FilmDbStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -24,7 +24,7 @@ public class FilmService {
     private final FilmDbStorage filmDbStorage;
     private final GenreService genreService;
     private final MpaService mpaService;
-    private final GenreDbStorage genreDbStorage;
+    private final UserService userService;
 
     public Collection<Film> findAll() {
         return filmDbStorage.findAll();
@@ -61,7 +61,7 @@ public class FilmService {
             log.warn("Не корректный ИД = {} MPA", film.getMpa().getId());
             throw new ValidationException("Не корректный МРА");
         }
-        if (film.getGenres() != null){
+        if (film.getGenres() != null) {
             film.getGenres().forEach(genre -> genreService.genreCheck(genre.getId()));
         }
 
@@ -107,23 +107,24 @@ public class FilmService {
     }
 
     public void deleteFilm(int id) {
-        filmDbStorage.removeById(id);
-        log.info("Фильм с ИД {} удален", id);
+        log.info("Удаляем фильм {}", id);
+        if (filmInDbExist(id) != null) {
+            filmDbStorage.removeById(id);
+            log.info("Фильм с ИД {} удален", id);
+        }
     }
 
-//    public void addLike(Integer id, Integer userId) {
-//        if (userStorage.findById(userId).isEmpty()) {
-//            throw new NotFoundException("Пользователь не найден");
-//        }
-//        filmDbStorage.addLike(id, userId);
-//    }
-//
-//    public void deleteLike(Integer id, Integer userId) {
-//        if (userStorage.findById(userId).isEmpty()) {
-//            throw new NotFoundException("Пользователь не найден");
-//        }
-//        filmDbStorage.deleteLike(id, userId);
-//    }
+    public void addLike(Integer id, Integer userId) {
+        filmInDbExist(id);
+        userService.userInDbExist(userId);
+        filmDbStorage.setLike(filmDbStorage.findById(id).orElse(null), userId);
+    }
+
+    public void deleteLike(Integer id, Integer userId) {
+        filmInDbExist(id);
+        userService.userInDbExist(userId);
+        filmDbStorage.unLike(filmDbStorage.findById(id).orElse(null), userId);
+    }
 
     public Collection<Film> findPopularFilm(Integer count) {
         return filmDbStorage.findPopularFilms(count);
@@ -132,7 +133,7 @@ public class FilmService {
     private Film filmInDbExist(Integer id) {
         Optional<Film> film = filmDbStorage.findById(id);
         if (film.isEmpty()) {
-            throw new NotFoundException("Фильм неыы найден");
+            throw new NotFoundException("Фильм не найден");
         }
         return film.orElse(null);
     }

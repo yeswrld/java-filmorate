@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.film;
+package ru.yandex.practicum.filmorate.storage.Films;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -80,8 +80,10 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
 
     @Override
     public void removeById(Integer id) {
-        String removeQ = "DELETE FROM FILMS_GENRES WHERE ID = ?";
-        jdbc.update(removeQ, id);
+        String removeGenresQ = "DELETE FROM FILMS_GENRES WHERE FILM_ID = ?";
+        update(removeGenresQ, id);
+        String removeQ = "DELETE FROM FILMS WHERE ID = ?";
+        delete(removeQ, id);
     }
 
     @Override
