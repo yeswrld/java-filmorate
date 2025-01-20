@@ -2,9 +2,10 @@ package ru.yandex.practicum.filmorate.storage.Films;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.service.GenreService;
@@ -15,8 +16,7 @@ import java.util.*;
 
 
 @Slf4j
-@Repository
-
+@Component
 public class FilmDbStorageImplementation extends BaseStorage<Film> implements FilmDbStorage {
     private final FilmRowMapper filmRowMapper;
     private final GenreService genreService;
@@ -133,6 +133,5 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
             jdbc.update(updGenresQ.toString(), params.toArray());
         }
     }
-
 
 }

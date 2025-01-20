@@ -3,10 +3,12 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.Genre.GenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.Films.FilmDbStorage;
 
@@ -91,8 +93,9 @@ public class FilmService {
             log.error("Продолжительность фильма должна быть положительным числом.");
             throw new ValidationException("Продолжительность фильма должна быть положительным числом.");
         } else oldFilm.setDuration(newFilm.getDuration());
-        if (newFilm.getMpa().getId() < 1 || newFilm.getMpa().getId() > 5) {
-            log.error("MPA фильма должна быть 1-5");
+        //newFilm.getMpa().getId() < 1 || newFilm.getMpa().getId() > 5
+        if (mpaService.mpaExists(newFilm.getMpa().getId())) {
+            log.error("MPA фильма не найдена в базе");
         } else oldFilm.setMpa(newFilm.getMpa());
         oldFilm.setGenres(newFilm.getGenres());
         Film updFilm = filmDbStorage.update(oldFilm);
@@ -137,4 +140,5 @@ public class FilmService {
         }
         return film.orElse(null);
     }
+
 }
