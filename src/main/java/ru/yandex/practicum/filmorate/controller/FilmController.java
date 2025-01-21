@@ -35,14 +35,20 @@ public class FilmController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Film create(@RequestBody Film film) {
-        filmService.addOrUpdateFilm(film);
+        filmService.addFilm(film);
         return film;
     }
 
     @PutMapping
     public Film update(@RequestBody Film film) {
-        filmService.addOrUpdateFilm(film);
+        filmService.update(film);
         return film;
+    }
+
+    @DeleteMapping("/{id}")
+    public String deleteFilm(@PathVariable Integer id) {
+        filmService.deleteFilm(id);
+        return ("Фильм с ИД = " + id + " удалён");
     }
 
     @PutMapping("/{id}/like/{userId}")
