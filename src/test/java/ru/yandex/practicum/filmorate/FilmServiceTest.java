@@ -26,7 +26,7 @@ public class FilmServiceTest {
     private final FilmDbStorage filmDbStorage;
 
     @Test
-    public void FindFilmById() {
+    public void findFilmById() {
         Mpa mpa = new Mpa();
         mpa.setId(5);
         mpa.setName("NC-17");
