@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.Films;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
@@ -15,7 +13,6 @@ import ru.yandex.practicum.filmorate.storage.mappers.FilmRowMapper;
 import java.util.*;
 
 
-@Slf4j
 @Component
 public class FilmDbStorageImplementation extends BaseStorage<Film> implements FilmDbStorage {
     private final FilmRowMapper filmRowMapper;
@@ -106,11 +103,11 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
     @Override
     public Collection<Film> findPopularFilms(Integer count) {
         String popularFilmQ = "SELECT ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA_ID FROM FILMS AS F " +
-                "LEFT OUTER JOIN LIKES AS L ON F.ID = L.FILM_ID " +
-                "GROUP BY F.ID " +
-                "ORDER BY COUNT(L.FILM_ID) " +
-                "DESC " +
-                "LIMIT " + count;
+                              "LEFT OUTER JOIN LIKES AS L ON F.ID = L.FILM_ID " +
+                              "GROUP BY F.ID " +
+                              "ORDER BY COUNT(L.FILM_ID) " +
+                              "DESC " +
+                              "LIMIT " + count;
         return jdbc.query(popularFilmQ, filmRowMapper);
     }
 

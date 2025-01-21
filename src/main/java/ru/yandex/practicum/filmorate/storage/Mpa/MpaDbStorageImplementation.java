@@ -17,40 +17,25 @@ public class MpaDbStorageImplementation implements MpaDbStorage {
 
     @Override
     public Collection<Mpa> findAll() {
-        String findAllQ = """
-                SELECT ID, NAME
-                FROM MPA
-                """;
+        String findAllQ = "SELECT ID, NAME FROM MPA";
         return jdbc.query(findAllQ, new MpaRowMapper());
     }
 
     @Override
     public Mpa get(Integer id) {
-        String getQ = """
-                SELECT ID, NAME
-                FROM MPA
-                WHERE ID = ?
-                """;
+        String getQ = "SELECT ID, NAME FROM MPA WHERE ID = ?";
         return jdbc.queryForObject(getQ, new MpaRowMapper(), id);
     }
 
     @Override
     public Mpa findById(Integer id) {
-        String findByIdQ = """
-                SELECT ID, NAME
-                FROM MPA
-                WHERE ID = ? 
-                """;
+        String findByIdQ = "SELECT ID, NAME FROM MPA WHERE ID = ?";
         return jdbc.queryForObject(findByIdQ, new MpaRowMapper(), id);
     }
 
     @Override
     public boolean mpaExists(Integer id) {
-        String mpaExistsQ = """
-                SELECT CASE WHEN EXISTS
-                (SELECT * FROM MPA WHERE ID = ?)
-                THEN 'TRUE' ELSE 'FALSE' END
-                """;
+        String mpaExistsQ = "SELECT CASE WHEN EXISTS (SELECT * FROM MPA WHERE ID = ?) THEN 'TRUE' ELSE 'FALSE' END";
         return Boolean.TRUE.equals(jdbc.queryForObject(mpaExistsQ, Boolean.class, id));
     }
 }

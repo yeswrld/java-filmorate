@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.Collection;
-import java.util.Optional;
 
 
 @RestController
@@ -23,7 +22,7 @@ public class FilmController {
     }
 
     @GetMapping("/{id}")
-    public Optional<Film> findById(@PathVariable Integer id) {
+    public Film findById(@PathVariable Integer id) {
         return filmService.findById(id);
     }
 
@@ -47,10 +46,11 @@ public class FilmController {
     }
 
     @DeleteMapping("/{id}")
-    public String deleteFilm(@PathVariable Integer id){
+    public String deleteFilm(@PathVariable Integer id) {
         filmService.deleteFilm(id);
         return ("Фильм с ИД = " + id + " удалён");
     }
+
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable Integer id,
                         @PathVariable Integer userId) {

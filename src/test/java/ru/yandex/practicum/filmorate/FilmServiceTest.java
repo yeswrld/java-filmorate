@@ -11,12 +11,11 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.Films.FilmDbStorage;
-import ru.yandex.practicum.filmorate.storage.Users.UserDbStorage;
 
 import java.time.LocalDate;
 import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -25,10 +24,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Sql(scripts = {"/schema.sql", "/data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class FilmServiceTest {
     private final FilmDbStorage filmDbStorage;
-    private final UserDbStorage userDbStorage;
 
     @Test
-    public void testFindFilmById() {
+    public void FindFilmById() {
         Mpa mpa = new Mpa();
         mpa.setId(5);
         mpa.setName("NC-17");
@@ -44,17 +42,17 @@ public class FilmServiceTest {
         film.setDuration(90);
         film.setMpa(mpa);
         film.setGenres(genres);
-        Film filmFromDb = filmDbStorage.findById(1).orElseThrow( () -> new NotFoundException("Фильм не найден"));
+        Film filmFromDb = filmDbStorage.findById(1).orElseThrow(() -> new NotFoundException("Фильм не найден"));
         Assertions.assertEquals(film, filmFromDb);
     }
 
     @Test
-    public void getAllFromFilms(){
+    public void getAllFromFilms() {
         Assertions.assertEquals(2, filmDbStorage.findAll().size());
     }
 
     @Test
-    public void updateFilm(){
+    public void updateFilm() {
         Mpa mpa = new Mpa();
         mpa.setId(5);
         mpa.setName("NC-17");
@@ -82,14 +80,14 @@ public class FilmServiceTest {
     }
 
     @Test
-    public void removeFromFilms(){
+    public void removeFromFilmsById() {
         filmDbStorage.removeById(1);
         Assertions.assertEquals(1, filmDbStorage.findAll().size());
     }
 
     @Test
-    public void setAndUnsetLike(){
-      Film film =  filmDbStorage.findById(1).orElseThrow(() -> new NotFoundException("Фильм не найден"));
+    public void setAndUnsetLike() {
+        Film film = filmDbStorage.findById(1).orElseThrow(() -> new NotFoundException("Фильм не найден"));
         filmDbStorage.setLike(film, 1);
         filmDbStorage.setLike(film, 2);
     }

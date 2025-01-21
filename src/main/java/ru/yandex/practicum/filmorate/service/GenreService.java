@@ -22,28 +22,33 @@ public class GenreService {
         return genreDbStorage.findAll();
     }
 
-    public Genre findById(Integer id){
-        if (!genreDbStorage.genreExist(id)){
+    public Genre findById(Integer id) {
+        log.info("Ищем жанр с ИД = {}", id);
+        if (!genreDbStorage.genreExist(id)) {
             log.warn("Жанр с id={} не найден", id);
             throw new NotFoundException("Жанр не найден");
         }
+        log.info("Жанр с ИД = {} найден, и это - {}", id, genreDbStorage.findById(id));
         return genreDbStorage.findById(id);
     }
 
-    public void genreCheck(Integer id){
-        if (!genreDbStorage.genreExist(id)){
+    public void genreCheck(Integer id) {
+        log.info("Ищем есть ли жанр с ИД = {} в базе", id);
+        if (!genreDbStorage.genreExist(id)) {
             log.warn("Жанр с id={} не найден", id);
             throw new ValidationException("Жанр не найден");
         }
+        log.info("Жанр с ИД = {} найден, и это - {}", id, genreDbStorage.findById(id).getName());
     }
 
-    public List<Genre> findFilmGenres(Integer id){
+    public List<Genre> findFilmGenres(Integer id) {
+        log.info("Ищем жанры фильма с ИД = {}", id);
         List<Integer> genreIds = genreDbStorage.genreIds(id);
         List<Genre> genres = new ArrayList<>();
-        if (!genreIds.isEmpty()){
+        if (!genreIds.isEmpty()) {
             genres = genreDbStorage.findFilmGenres(genreIds);
         }
-        //log.info("Жанры {}", genres);
+        log.info("Жанры фильма с ИД = {} - {}", id, genres.toString());
         return genres;
     }
 

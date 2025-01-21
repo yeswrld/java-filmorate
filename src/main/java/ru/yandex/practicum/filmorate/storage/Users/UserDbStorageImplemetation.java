@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.Users;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -9,10 +8,11 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.BaseStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.UserRowMapper;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
-@Slf4j
 @Repository
 public class UserDbStorageImplemetation extends BaseStorage<User> implements UserDbStorage {
     private final UserRowMapper userRowMapper;
@@ -54,7 +54,13 @@ public class UserDbStorageImplemetation extends BaseStorage<User> implements Use
     }
 
     @Override
-    public Optional<User> findById(int id) {
+    public void deleteUser(Integer id) {
+        String deleteQ = "DELETE FROM USERS WHERE ID = ?";
+        delete(deleteQ, id);
+    }
+
+    @Override
+    public Optional<User> findUserById(int id) {
         String findByIdQ = "SELECT * FROM USERS WHERE ID = ?";
         try {
             User result = findOne(userRowMapper, findByIdQ, id);
@@ -70,10 +76,6 @@ public class UserDbStorageImplemetation extends BaseStorage<User> implements Use
         return findMany(userRowMapper, findAllQ);
     }
 
-    @Override
-    public User findUserById(int id) {
-        return null;
-    }
 
     @Override
     public void addFriend(Integer userA, Integer userB) {

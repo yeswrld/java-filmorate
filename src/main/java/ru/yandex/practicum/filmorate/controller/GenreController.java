@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.service.GenreService;
 
 import java.util.Collection;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,12 +17,12 @@ public class GenreController {
     private final GenreService genreService;
 
     @GetMapping
-    public Collection<Genre> findAll(){
+    public Collection<Genre> findAll() {
         return genreService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Genre get(@PathVariable Integer id){
+    public Genre get(@PathVariable Integer id) {
         return genreService.findById(id);
     }
 }

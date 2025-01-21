@@ -3,39 +3,33 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.storage.Genre.GenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.Films.FilmDbStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 
 @Service
 @RequiredArgsConstructor
 public class FilmService {
+    protected static final LocalDate DAYOFFILMDATE = LocalDate.of(1895, 12, 28);
+    protected static final Integer FILM_DESCRIPTION_MAXLENGTH = 200;
     private static final Logger log = LoggerFactory.getLogger(FilmService.class);
     private final FilmDbStorage filmDbStorage;
     private final GenreService genreService;
     private final MpaService mpaService;
     private final UserService userService;
+    private final Map<Integer, Film> films = new HashMap<>();
 
     public Collection<Film> findAll() {
         return filmDbStorage.findAll();
     }
-
-    protected static final LocalDate DAYOFFILMDATE = LocalDate.of(1895, 12, 28);
-    protected static final Integer FILM_DESCRIPTION_MAXLENGTH = 200;
-    private final Map<Integer, Film> films = new HashMap<>();
-
 
     public Film addFilm(Film film) {
         log.info("Создаем фильм {}", film);
@@ -74,8 +68,8 @@ public class FilmService {
     }
 
     public Film update(Film newFilm) {
-        log.info("Обновляем на фильм {}", newFilm);
-        Film oldFilm = filmInDbExist(newFilm.getId());
+        log.info("Обновляем фильм {}", newFilm);
+        Film oldFilm = filmDbStorage.findById(newFilm.getId()).orElseThrow(() -> new NotFoundException("Фильм не найден"));
         log.info("ФИЛЬМ НАЙДЕН {}", oldFilm);
         if (newFilm.getName().isBlank()) {
             log.error("Название фильма пустое");
@@ -103,42 +97,37 @@ public class FilmService {
         return updFilm;
     }
 
-    public Optional<Film> findById(int id) {
-        Optional<Film> filmOptional = filmDbStorage.findById(id);
-        if (filmOptional.isEmpty()) throw new NotFoundException("Фильм не найден");
-        return filmOptional;
+    public Film findById(int id) {
+        log.info("Ищем фильм с ИД = {}", id);
+        Film film = filmDbStorage.findById(id).orElseThrow(() -> new NotFoundException("Фильм не найден"));
+        log.info("Фильм с ИД = {} найден", id);
+        return film;
     }
 
     public void deleteFilm(int id) {
         log.info("Удаляем фильм {}", id);
-        if (filmInDbExist(id) != null) {
-            filmDbStorage.removeById(id);
-            log.info("Фильм с ИД {} удален", id);
-        }
+        Film filmFromDb = filmDbStorage.findById(id).orElseThrow(() -> new NotFoundException("Фильм не найден"));
+        filmDbStorage.removeById(filmFromDb.getId());
+        log.info("Фильм с ИД {} удален", id);
     }
 
     public void addLike(Integer id, Integer userId) {
-        filmInDbExist(id);
+        log.info("Добавляем лайк к фильму с ИД = {} от пользователя с ИД = {}", id, userId);
         userService.userInDbExist(userId);
-        filmDbStorage.setLike(filmDbStorage.findById(id).orElse(null), userId);
+        filmDbStorage.setLike(filmDbStorage.findById(id).orElseThrow(() -> new NotFoundException("Фильм не найден")), userId);
+        log.info("Лайк к фильму с ИД = {} от пользователя с ИД = {} добавлен", id, userId);
     }
 
     public void deleteLike(Integer id, Integer userId) {
-        filmInDbExist(id);
+        log.info("Удаляем лайк у фильма с ИД = {} от пользователя с ИД = {}", id, userId);
         userService.userInDbExist(userId);
-        filmDbStorage.unLike(filmDbStorage.findById(id).orElse(null), userId);
+        filmDbStorage.unLike(filmDbStorage.findById(id).orElseThrow(() -> new NotFoundException("Фильм не найден")), userId);
+        log.info("Лайк у фильма с ИД = {} от пользователя с ИД = {} удален", id, userId);
     }
 
     public Collection<Film> findPopularFilm(Integer count) {
         return filmDbStorage.findPopularFilms(count);
     }
 
-    private Film filmInDbExist(Integer id) {
-        Optional<Film> film = filmDbStorage.findById(id);
-        if (film.isEmpty()) {
-            throw new NotFoundException("Фильм не найден");
-        }
-        return film.orElse(null);
-    }
 
 }

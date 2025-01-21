@@ -21,6 +21,7 @@ public class UserService {
     private final UserDbStorage userDbStorage;
 
     public Collection<User> findAll() {
+        log.info("Возвращаем список пользователей, всго найдено - {}", userDbStorage.findAll().size());
         return userDbStorage.findAll();
     }
 
@@ -81,23 +82,32 @@ public class UserService {
 
 
     public User findUserById(int id) {
-        return userDbStorage.findUserById(id);
+        log.info("Ищем пользователя с ИД = {}", id);
+        return userDbStorage.findUserById(id).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+    }
+
+    public void deleteUserById(int id) {
+        log.info("Удаляем пользователя с ИД = {}", id);
+        userInDbExist(id);
+        userDbStorage.deleteUser(id);
+        log.info("Пользователь с ИД = {} удалён", id);
     }
 
     public Set<User> getFriends(Integer id) {
+        log.info("Ищем друзей пользователя с ИД = {}", id);
         userInDbExist(id);
         log.info("Ищем друзей пользователя {}", id);
         Collection<Integer> friendsIds = userDbStorage.getFriends(id);
         Set<User> friends = new HashSet<>();
         for (Integer i : friendsIds) {
-            friends.add(userDbStorage.findById(i).orElse(null));
+            friends.add(userDbStorage.findUserById(i).orElse(null));
         }
-        log.info("На выходе - {}", friends.size());
+        log.info("У пользователя с ИД = {} друзья {}", id, friends);
         return friends;
     }
 
     public void addFriend(Integer userA, Integer userB) {
-        log.info("Добавляем к пользователю {} в друзья пользователя {}", userA, userB);
+        log.info("Добавляем к пользователю с ИД =  {} в друзья пользователя с ИД =  {}", userA, userB);
         if (userInDbExist(userA) != null && userInDbExist(userB) != null) {
             userDbStorage.addFriend(userA, userB);
         }
@@ -105,12 +115,15 @@ public class UserService {
     }
 
     public void deleteFriend(Integer userA, Integer userB) {
+        log.info("Удаляем у пользователя с ИД = {} друга-пользователя с ИД = {}", userA, userB);
         if (userInDbExist(userA) != null && userInDbExist(userB) != null) {
             userDbStorage.deleteFriend(userA, userB);
         }
+        log.info("Пользователь с ИД =  {} и с ИД = {} больше не друзья", userA, userB);
     }
 
     public Set<User> getCommonFriends(Integer userA, Integer userB) {
+        log.info("Ищем общих друзей пользователя с ИД = {} и ИД = {}", userA, userB);
         userInDbExist(userA);
         userInDbExist(userB);
         Set<Integer> userAfriends = new HashSet<>(userDbStorage.getFriends(userA));
@@ -118,14 +131,14 @@ public class UserService {
         userAfriends.retainAll(userBfriends);
         Set<User> commonFriends = new HashSet<>();
         for (Integer i : userAfriends) {
-            commonFriends.add(userDbStorage.findById(i).orElse(null));
+            commonFriends.add(userDbStorage.findUserById(i).orElse(null));
         }
-        log.info("COMMON FRIENDS - {}", commonFriends.toString());
+        log.info("Общие друзья - {}", commonFriends);
         return commonFriends;
     }
 
     public User userInDbExist(Integer id) {
-        Optional<User> user = userDbStorage.findById(id);
+        Optional<User> user = userDbStorage.findUserById(id);
         if (user.isEmpty()) {
             throw new NotFoundException("Пользователь не найден");
         }
