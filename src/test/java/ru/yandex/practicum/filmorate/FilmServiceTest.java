@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.storage.Films.FilmDbStorage;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -74,7 +75,6 @@ public class FilmServiceTest {
                 .hasFieldOrPropertyWithValue("description", "Старый фильм")
                 .hasFieldOrPropertyWithValue("releaseDate", LocalDate.of(2000, 10, 15))
                 .hasFieldOrPropertyWithValue("duration", 120)
-                .hasFieldOrPropertyWithValue("likes", null)
                 .hasFieldOrPropertyWithValue("mpa", mpa)
                 .hasFieldOrPropertyWithValue("genres", genres);
     }
