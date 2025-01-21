@@ -63,4 +63,6 @@ public class UserServiceTest {
         userDbStorage.deleteUser(55);
         assertThat(userDbStorage.findAll()).hasSize(2);
     }
+
 }
+

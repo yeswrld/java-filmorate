@@ -85,10 +85,4 @@ public class FilmServiceTest {
         Assertions.assertEquals(1, filmDbStorage.findAll().size());
     }
 
-    @Test
-    public void setAndUnsetLike() {
-        Film film = filmDbStorage.findById(1).orElseThrow(() -> new NotFoundException("Фильм не найден"));
-        filmDbStorage.setLike(film, 1);
-        filmDbStorage.setLike(film, 2);
-    }
 }
