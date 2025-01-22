@@ -20,11 +20,13 @@ public class UserController {
 
     @GetMapping
     public Collection<User> findAll() {
+        log.info("Выводим всех пользователей с базы");
         return userService.findAll();
     }
 
     @GetMapping("/{id}")
     public User findUserByID(@PathVariable Integer id) {
+        log.info("Выводим пользователя с ИД = {}", id);
         return userService.findUserById(id);
     }
 
@@ -36,35 +38,46 @@ public class UserController {
 
     @GetMapping("/{id}/friends/common/{anotherId}")
     public Set<User> commonFriends(@PathVariable Integer id, @PathVariable Integer anotherId) {
+        log.info("Выводим общих друзей пользователей с ИД = {} и ИД ={}", id, anotherId);
         return userService.getCommonFriends(id, anotherId);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public User create(@RequestBody User user) throws NotFoundException {
+        log.info("Добавляем пользователя {}", user);
         userService.addUser(user);
+        log.info("Пользователь успешно добавлен");
         return user;
     }
 
     @PutMapping
     public User update(@RequestBody User user) {
+        log.info("Обновляем пользователя {}", user);
         userService.updateUser(user);
+        log.info("Пользователь успешно обновлен");
         return user;
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Integer id) {
+        log.info("Удаляем пользователя с ИД = {}", id);
         userService.deleteUserById(id);
+        log.info("Пользователь успешно удален");
     }
 
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
+        log.info("Добавляем в друзья к пользователю c ИД = {} пользователя с ИД = {}", id, friendId);
         userService.addFriend(id, friendId);
+        log.info("Пользователи успешно подружились");
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public void removeFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
+        log.info("Удаляем из друзей пользователя с ИД = {} пользователя с ИД = {}", id, friendId);
         userService.deleteFriend(id, friendId);
+        log.info("Пользователи больше не друзья");
     }
 
 

@@ -8,10 +8,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.BaseStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.UserRowMapper;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public class UserDbStorageImplemetation extends BaseStorage<User> implements UserDbStorage {
@@ -90,11 +87,26 @@ public class UserDbStorageImplemetation extends BaseStorage<User> implements Use
     }
 
     @Override
-    public Collection<Integer> getFriends(Integer id) {
-        String getFriendsQ = "SELECT ID FROM USERS WHERE ID = ? ";
-        jdbcTemplate.queryForObject(getFriendsQ, Integer.class, id);
-        String result = "SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?";
-        return jdbcTemplate.queryForList(result, Integer.class, id);
+    public List<User> getFriends(Integer id) {
+        String getFriendsQ = """
+                SELECT u.* FROM USERS u
+                JOIN FRIENDS f ON u.id = f.FRIEND_ID
+                WHERE F.USER_ID  = ?
+                """;
+        return findMany(userRowMapper, getFriendsQ, id);
     }
+
+    @Override
+    public Set<User> getCommonFriends(Integer userA, Integer userB) {
+        String getCommonFriendsQ = """
+                SELECT * FROM USERS WHERE ID IN (
+                SELECT FRIEND_ID
+                FROM FRIENDS
+                WHERE USER_ID = ? INTERSECT (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?)
+                )
+                """;
+        return new HashSet<>(findMany(userRowMapper, getCommonFriendsQ, userA, userB));
+    }
+
 
 }

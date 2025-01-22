@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.Genre.GenreDbStorage;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -23,33 +22,23 @@ public class GenreService {
     }
 
     public Genre findById(Integer id) {
-        log.info("Ищем жанр с ИД = {}", id);
         if (!genreDbStorage.genreExist(id)) {
-            log.warn("Жанр с id={} не найден", id);
+            log.info("Жанр не найден");
             throw new NotFoundException("Жанр не найден");
         }
-        log.info("Жанр с ИД = {} найден, и это - {}", id, genreDbStorage.findById(id));
         return genreDbStorage.findById(id);
     }
 
-    public void genreCheck(Integer id) {
-        log.info("Ищем есть ли жанр с ИД = {} в базе", id);
+    public Boolean genreCheck(Integer id) {
         if (!genreDbStorage.genreExist(id)) {
-            log.warn("Жанр с id={} не найден", id);
+            log.info("Жанр не найден");
             throw new ValidationException("Жанр не найден");
         }
-        log.info("Жанр с ИД = {} найден, и это - {}", id, genreDbStorage.findById(id).getName());
+        return true;
     }
 
     public List<Genre> findFilmGenres(Integer id) {
-        log.info("Ищем жанры фильма с ИД = {}", id);
-        List<Integer> genreIds = genreDbStorage.genreIds(id);
-        List<Genre> genres = new ArrayList<>();
-        if (!genreIds.isEmpty()) {
-            genres = genreDbStorage.findFilmGenres(genreIds);
-        }
-        log.info("Жанры фильма с ИД = {} - {}", id, genres.toString());
-        return genres;
-    }
+        return genreDbStorage.findFilmGenres(id);
 
+    }
 }

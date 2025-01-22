@@ -20,17 +20,14 @@ public class MpaService {
     }
 
     public Mpa findById(Integer id) {
-        log.info("Получен запрос на МРА с ИД = {}", id);
         if (!mpaDbStorage.mpaExists(id)) {
-            log.warn("МРА с ИД={} не найден", id);
+            log.info("МРА с запрашиваемым ид не найден");
             throw new NotFoundException("МРА с запрашиваемым ид не найден");
         }
-        log.info("МРА с ИД = {} - это {}", id, mpaDbStorage.get(id).getName());
         return mpaDbStorage.findById(id);
     }
 
     public boolean mpaExists(Integer id) {
-        log.info("Проверяем есть ли МРА с ИД = {} в базе", id);
         return mpaDbStorage.mpaExists(id);
     }
 }

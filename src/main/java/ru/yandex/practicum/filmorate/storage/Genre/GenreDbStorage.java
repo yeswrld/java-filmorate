@@ -12,8 +12,8 @@ public interface GenreDbStorage {
 
     boolean genreExist(Integer id);
 
-    List<Integer> genreIds(Integer id);
+    List<Integer> filmGenreSIds(Integer id);
 
-    List<Genre> findFilmGenres(List<Integer> genreIds);
+    List<Genre> findFilmGenres(Integer filmID);
 
 }

@@ -43,7 +43,7 @@ public class GenreDbStorageImplementation implements GenreDbStorage {
     }
 
     @Override
-    public List<Integer> genreIds(Integer id) {
+    public List<Integer> filmGenreSIds(Integer id) {
         String genreIdsQ = "SELECT GENRE_ID FROM FILMS_GENRES WHERE FILM_ID = ? ";
         List<Integer> genresIds = jdbc.queryForList(genreIdsQ, Integer.class, id);
         Collections.sort(genresIds);
@@ -51,17 +51,13 @@ public class GenreDbStorageImplementation implements GenreDbStorage {
     }
 
     @Override
-    public List<Genre> findFilmGenres(List<Integer> genreIds) {
-        StringBuilder filmGenresQ = new StringBuilder("SELECT * FROM GENRES WHERE ID IN (");
-
-        for (int i = 0; i < genreIds.size(); i++) {
-            filmGenresQ.append(genreIds.get(i));
-            if (i < genreIds.size() - 1) {
-                filmGenresQ.append(", ");
-            } else {
-                filmGenresQ.append(") GROUP BY ID ORDER BY ID");
-            }
-        }
-        return jdbc.query(filmGenresQ.toString(), new GenreRowMapper());
+    public List<Genre> findFilmGenres(Integer filmID) {
+        String filmGenresQ = """
+                SELECT g.ID, g.NAME
+                FROM GENRES g
+                JOIN FILMS_GENRES fg ON g.ID = FG.GENRE_ID
+                WHERE fg.film_id IN (?)
+                """;
+        return jdbc.query(filmGenresQ, new GenreRowMapper(), filmID);
     }
 }
