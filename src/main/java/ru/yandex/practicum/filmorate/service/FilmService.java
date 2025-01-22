@@ -115,8 +115,9 @@ public class FilmService {
         if (film.getDuration() <= 0) {
             throw new ValidationException("Продолжительность фильма должна быть положительным числом.");
         } else oldFilm.setDuration(film.getDuration());
-        if (mpaService.mpaExists(film.getMpa().getId())) {
-        } else oldFilm.setMpa(film.getMpa());
+        if (!mpaService.mpaExists(film.getMpa().getId())) {
+            oldFilm.setMpa(film.getMpa());
+        }
         oldFilm.setGenres(film.getGenres());
         return oldFilm;
     }
