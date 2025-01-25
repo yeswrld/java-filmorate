@@ -32,7 +32,7 @@ public class GenreService {
     public Boolean genreCheck(Integer id) {
         if (!genreDbStorage.genreExist(id)) {
             log.info("Жанр не найден");
-            throw new ValidationException("Жанр не найден");
+            throw new NotFoundException("Жанр не найден");
         }
         return true;
     }

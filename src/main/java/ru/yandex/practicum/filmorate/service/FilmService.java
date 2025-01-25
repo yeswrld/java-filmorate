@@ -86,7 +86,7 @@ public class FilmService {
             throw new ValidationException("Не корректный МРА");
         }
         if (!mpaService.mpaExists(film.getMpa().getId())) {
-            throw new ValidationException("Не корректный МРА");
+            throw new NotFoundException("Не корректный МРА");
         }
         if (film.getGenres() != null) {
             List<Genre> genres = new ArrayList<>();
