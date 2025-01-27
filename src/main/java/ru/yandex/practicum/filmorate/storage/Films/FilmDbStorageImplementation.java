@@ -78,9 +78,9 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
     @Override
     public void removeById(Integer id) {
         String removeGenresQ = "DELETE FROM FILMS_GENRES WHERE FILM_ID = ?";
-        update(removeGenresQ, id);
+        delete(removeGenresQ, id);
         String removeLikesQ = "DELETE FROM LIKES WHERE FILM_ID = ?";
-        update(removeLikesQ, id);
+        delete(removeLikesQ, id);
         String removeQ = "DELETE FROM FILMS WHERE ID = ?";
         delete(removeQ, id);
     }
