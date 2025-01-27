@@ -112,7 +112,7 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
         LIMIT ?
         """;
 
-        List<Film> films = jdbc.query(popularFilmQ, filmRowMapper);
+        List<Film> films = findMany(filmRowMapper, popularFilmQ, count);
 
         return films;
     }
