@@ -54,6 +54,7 @@ public class UserDbStorageImplemetation extends BaseStorage<User> implements Use
     public void deleteUser(Integer id) {
         String deleteQ = "DELETE FROM FRIENDS WHERE USER_ID = ?";
         delete(deleteQ, id);
+
         deleteQ = "DELETE FROM FRIENDS WHERE FRIEND_ID = ?";
         delete(deleteQ, id);
 
