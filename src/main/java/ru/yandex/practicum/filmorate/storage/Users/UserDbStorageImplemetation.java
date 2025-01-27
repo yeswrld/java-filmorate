@@ -52,7 +52,14 @@ public class UserDbStorageImplemetation extends BaseStorage<User> implements Use
 
     @Override
     public void deleteUser(Integer id) {
-        String deleteQ = "DELETE FROM USERS WHERE ID = ?";
+        String deleteQ = "DELETE FROM FRIENDS WHERE USER_ID = ?";
+        delete(deleteQ, id);
+        deleteQ = "DELETE FROM FRIENDS WHERE FRIEND_ID = ?";
+        delete(deleteQ, id);
+        deleteQ = "DELETE FROM LIKES WHERE USER_ID = ?";
+        delete(deleteQ, id);
+
+        deleteQ = "DELETE FROM USERS WHERE ID = ?";
         delete(deleteQ, id);
     }
 
