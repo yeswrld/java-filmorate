@@ -102,13 +102,19 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
 
     @Override
     public Collection<Film> findPopularFilms(Integer count) {
-        String popularFilmQ = "SELECT ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA_ID FROM FILMS AS F " +
-                "LEFT OUTER JOIN LIKES AS L ON F.ID = L.FILM_ID " +
-                "GROUP BY F.ID " +
-                "ORDER BY COUNT(L.FILM_ID) " +
-                "DESC " +
-                "LIMIT " + count;
-        return jdbc.query(popularFilmQ, filmRowMapper);
+        String popularFilmQ = """
+        SELECT f.*,
+               mpa.*,
+               (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) as like_count
+        FROM films f
+        JOIN mpa ON f.mpa_id = mpa.id
+        ORDER BY like_count DESC
+        LIMIT ?
+        """;
+
+        List<Film> films = jdbc.query(popularFilmQ, filmRowMapper);
+
+        return films;
     }
 
 
