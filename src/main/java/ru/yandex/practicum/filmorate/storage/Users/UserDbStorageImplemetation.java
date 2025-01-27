@@ -56,6 +56,7 @@ public class UserDbStorageImplemetation extends BaseStorage<User> implements Use
         delete(deleteQ, id);
         deleteQ = "DELETE FROM FRIENDS WHERE FRIEND_ID = ?";
         delete(deleteQ, id);
+
         deleteQ = "DELETE FROM LIKES WHERE USER_ID = ?";
         delete(deleteQ, id);
 
