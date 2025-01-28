@@ -57,10 +57,9 @@ CREATE TABLE IF NOT EXISTS Reviews (
   isPositive BOOLEAN,
   userId INTEGER,
   filmId INTEGER,
-  usefulness NUMERIC,
-  FOREIGN KEY (userId) REFERENCES Users(id),
-  FOREIGN KEY (filmId) REFERENCES Films(id),
-  CHECK (isPositive IN (TRUE, FALSE))
+  useful INTEGER DEFAULT 0
+  --FOREIGN KEY (userId) REFERENCES Users(id) ON DELETE CASCADE,
+  --FOREIGN KEY (filmId) REFERENCES Films(id) ON DELETE CASCADE
 );
 
 

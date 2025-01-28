@@ -3,23 +3,24 @@ package ru.yandex.practicum.filmorate.storage.mappers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.Review;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @Component
 @RequiredArgsConstructor
-public class ReviewRowMapper implements RowMapper<User> {
+public class ReviewRowMapper implements RowMapper<Review> {
 
     @Override
-    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-        User user = new User();
-        user.setId(rs.getInt("ID"));
-        user.setEmail((rs.getString("EMAIL")));
-        user.setLogin(rs.getString("LOGIN"));
-        user.setName(rs.getString("NAME"));
-        user.setBirthday(rs.getDate("BIRTHDAY").toLocalDate());
-        return user;
+    public Review mapRow(ResultSet rs, int rowNum) throws SQLException {
+        Review review = new Review();
+        review.setReviewId(rs.getInt("reviewId"));
+        review.setContent(rs.getString("content"));
+        review.setIsPositive(rs.getBoolean("isPositive"));
+        review.setUserId(rs.getInt("userId"));
+        review.setFilmId(rs.getInt("filmId"));
+        review.setUseful(rs.getInt("useful"));
+        return review;
     }
 }
