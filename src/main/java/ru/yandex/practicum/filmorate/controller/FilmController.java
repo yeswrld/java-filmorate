@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -30,16 +31,15 @@ public class FilmController {
     }
 
     @GetMapping(value = "/popular", params = "count")
-    public Collection<Film> findPopular(@RequestParam(name = "count",
-            defaultValue = "10") Integer count) {
+    public Collection<Film> findPopular(@RequestParam(name = "count") Integer count) {
         log.info("Выводим список из {} популярных фильмов", count);
         return filmService.findPopularFilm(count);
     }
 
-    @GetMapping(value = "/popular", params = {"count", "genreId", "year"})
+    @GetMapping(value = "/popular")
     public Collection<Film> popularWithParams(@RequestParam(name = "count", defaultValue = "10") Integer count,
-                                              @RequestParam(name = "genreId") Integer genreId,
-                                              @RequestParam(name = "year") Integer year) {
+                                              @RequestParam(name = "genreId", defaultValue = "%") String genreId,
+                                              @RequestParam(name = "year", defaultValue = "%") String year) {
         log.info("Выводим список из {} популярных фильмов в жанре {} за {} год", count, genreId, year);
         return filmService.popularWithParams(count, genreId, year);
     }

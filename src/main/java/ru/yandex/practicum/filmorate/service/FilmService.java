@@ -64,7 +64,7 @@ public class FilmService {
         return filmDbStorage.findPopularFilms(count);
     }
 
-    public Collection<Film> popularWithParams(Integer count, Integer genreId, Integer year) {
+    public Collection<Film> popularWithParams(Integer count, String genreId, String year) {
         return filmDbStorage.popularWithParams(count, genreId, year);
     }
 

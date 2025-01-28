@@ -120,15 +120,15 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
     }
 
     @Override
-    public Collection<Film> popularWithParams(Integer count, Integer genreId, Integer year) {
+    public Collection<Film> popularWithParams(Integer count, String genreId, String year) {
         String popularFilmQ = """
         SELECT f.*,
                mpa.*,
                (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) as like_count
         FROM films f
         JOIN mpa ON f.mpa_id = mpa.id
-        WHERE EXISTS (SELECT 1 FROM FILMS_GENRES fg WHERE fg.film_id = f.id AND fg.genre_id = ?)
-          AND FORMATDATETIME(f.RELEASE_DATE, 'YYYY') = ?
+        WHERE EXISTS (SELECT 1 FROM FILMS_GENRES fg WHERE fg.film_id = f.id AND fg.genre_id LIKE ?)
+          AND FORMATDATETIME(f.RELEASE_DATE, 'YYYY') LIKE ?
         ORDER BY like_count DESC
         LIMIT ?
         """;
