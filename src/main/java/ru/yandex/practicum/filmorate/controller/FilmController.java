@@ -29,11 +29,19 @@ public class FilmController {
         return filmService.findById(id);
     }
 
-    @GetMapping("/popular")
+    @GetMapping(value = "/popular", params = "count")
     public Collection<Film> findPopular(@RequestParam(name = "count",
             defaultValue = "10") Integer count) {
         log.info("Выводим список из {} популярных фильмов", count);
         return filmService.findPopularFilm(count);
+    }
+
+    @GetMapping(value = "/popular", params = {"count", "genreId", "year"})
+    public Collection<Film> popularWithParams(@RequestParam(name = "count", defaultValue = "10") Integer count,
+                                              @RequestParam(name = "genreId") Integer genreId,
+                                              @RequestParam(name = "year") Integer year) {
+        log.info("Выводим список из {} популярных фильмов в жанре {} за {} год", count, genreId, year);
+        return filmService.popularWithParams(count, genreId, year);
     }
 
     @PostMapping
