@@ -90,4 +90,14 @@ public class ReviewDbStorageImplementation extends BaseStorage<Review> implement
             return findMany(reviewRowMapper, findAllwithoutFilmQ, count);
         } else return findMany(reviewRowMapper, findAllwithFilm, filmId, count);
     }
+
+    @Override
+    public void setUseful(Integer reviewId, Integer userId, Integer useful) {
+        String usefulQ = """
+                UPDATE REVIEWS SET USEFUL = USEFUL + ? where reviewId = ?
+                """;
+        jdbcTemplate.update(usefulQ, useful, reviewId);
+    }
+
+
 }

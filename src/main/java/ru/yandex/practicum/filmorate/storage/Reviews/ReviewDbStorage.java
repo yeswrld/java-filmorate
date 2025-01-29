@@ -15,4 +15,6 @@ public interface ReviewDbStorage {
     Optional<Review> findById(Integer id);
 
     Collection<Review> findAll(Integer filmId, Integer count);
+
+    void setUseful(Integer reviewId, Integer userId, Integer useful);
 }

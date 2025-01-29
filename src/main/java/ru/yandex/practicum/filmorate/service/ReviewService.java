@@ -4,9 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.UserHaveLike;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.LikeDislike;
+import ru.yandex.practicum.filmorate.model.LikeForReview;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.Reviews.LikeDbStorage;
 import ru.yandex.practicum.filmorate.storage.Reviews.ReviewDbStorage;
+import ru.yandex.practicum.filmorate.storage.Users.UserDbStorage;
 
 import java.util.Collection;
 
@@ -15,8 +21,8 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class ReviewService {
     private final ReviewDbStorage reviewDbStorage;
-    private final UserService userService;
-    private final FilmService filmService;
+    private final LikeDbStorage likeDbStorage;
+    private final UserDbStorage userDbStorage;
 
     public Review add(Review review) {
         validateReview(review);
@@ -56,12 +62,45 @@ public class ReviewService {
         if (review.getFilmId() < 0) {
             throw new NotFoundException("Поле FilmID меньше нуля");
         }
-        if (review.getFilmId() == null){
+        if (review.getFilmId() == null) {
             throw new ValidationException("Поле FilmID пустое");
         }
         if (review.getIsPositive() == null) {
             throw new ValidationException("Поле IsPositive пустое");
         }
         return review;
+    }
+
+
+    public LikeForReview like(Integer reviewId, Integer userId, LikeDislike type) {
+        Review review = reviewDbStorage.findById(reviewId).orElseThrow(() -> new NotFoundException("Ревью не найдено"));
+        User user = userDbStorage.findUserById(userId).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        LikeForReview like = likeDbStorage.getLike(reviewId, userId);
+        if (like != null && type.equals(like.getLikeType())) {
+            throw new UserHaveLike("Пользователь уже поставил лайк к этому отзыву");
+        } else if (like != null && !type.equals(like.getLikeType())) {
+            likeDbStorage.deleteLike(reviewId, userId, like.getLikeType());
+        }
+        likeDbStorage.like(reviewId, userId, type);
+        LikeForReview newLike = likeDbStorage.getLike(reviewId, userId);
+
+        Integer useful;
+        if (type.equals(LikeDislike.LIKE)) {
+            useful = 1;
+        } else {
+            useful = -1;
+        }
+        reviewDbStorage.setUseful(reviewId, userId, useful);
+        return newLike;
+    }
+
+    public LikeForReview getLike(Integer reviewId, Integer userId) {
+        return likeDbStorage.getLike(reviewId, userId);
+    }
+
+
+    public void deleteLike(Integer reviewId, Integer userId, LikeDislike likeType) {
+        LikeForReview likeForReview = likeDbStorage.getLike(reviewId, userId);
+        likeDbStorage.deleteLike(reviewId, userId, likeType);
     }
 }

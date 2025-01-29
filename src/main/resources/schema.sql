@@ -58,10 +58,14 @@ CREATE TABLE IF NOT EXISTS Reviews (
   userId INTEGER,
   filmId INTEGER,
   useful INTEGER DEFAULT 0
-  --FOREIGN KEY (userId) REFERENCES Users(id) ON DELETE CASCADE,
-  --FOREIGN KEY (filmId) REFERENCES Films(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS review_likes (
+reviewId INTEGER REFERENCES Reviews(reviewId) ON DELETE CASCADE,
+userId INTEGER REFERENCES users(id) ON DELETE CASCADE,
+type varchar(10),
+PRIMARY KEY (reviewId, userId)
+)
 
 
 

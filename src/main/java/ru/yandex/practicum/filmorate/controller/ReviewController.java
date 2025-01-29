@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.model.LikeDislike;
+import ru.yandex.practicum.filmorate.model.LikeForReview;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
@@ -51,23 +53,23 @@ public class ReviewController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public void addLike(@PathVariable("id") Integer reviewId, @PathVariable Integer userId) {
-
+    public LikeForReview addLike(@PathVariable("id") Integer reviewId, @PathVariable Integer userId) {
+        return reviewService.like(reviewId, userId, LikeDislike.LIKE);
     }
 
     @PutMapping("/{id}/dislike/{userId}")
-    public void addDislike(@PathVariable("id") Integer reviewId, @PathVariable Integer userId) {
-
+    public LikeForReview addDislike(@PathVariable("id") Integer reviewId, @PathVariable Integer userId) {
+        return reviewService.like(reviewId, userId, LikeDislike.DISLIKE);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable("id") Integer reviewId, @PathVariable Integer userId) {
-
+        reviewService.deleteLike(reviewId, userId, LikeDislike.LIKE);
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
     public void deletedislike(@PathVariable("id") Integer reviewId, @PathVariable Integer userId) {
-
+        reviewService.deleteLike(reviewId, userId, LikeDislike.DISLIKE);
     }
 
 }
