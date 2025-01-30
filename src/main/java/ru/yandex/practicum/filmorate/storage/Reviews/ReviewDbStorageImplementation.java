@@ -47,10 +47,7 @@ public class ReviewDbStorageImplementation extends BaseStorage<Review> implement
                 UPDATE REVIEWS SET CONTENT = ?, ISPOSITIVE = ? WHERE REVIEWID = ?
                 """;
         jdbc.update(updQ,
-                updReview.getContent()
-                , updReview.getIsPositive()
-                , updReview.getReviewId()
-        );
+                updReview.getContent(), updReview.getIsPositive(), updReview.getReviewId());
         Review review = findById(updReview.getReviewId()).orElseThrow(() -> new NotFoundException("Отзыв не найден"));
         System.err.println(review);
         return review;
