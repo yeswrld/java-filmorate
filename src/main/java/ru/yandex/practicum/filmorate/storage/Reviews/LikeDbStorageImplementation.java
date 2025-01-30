@@ -2,10 +2,7 @@ package ru.yandex.practicum.filmorate.storage.Reviews;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.PathVariable;
 import ru.yandex.practicum.filmorate.model.LikeDislike;
 import ru.yandex.practicum.filmorate.model.LikeForReview;
 import ru.yandex.practicum.filmorate.storage.BaseStorage;
