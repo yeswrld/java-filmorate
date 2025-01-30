@@ -4,6 +4,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.BaseStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.ReviewRowMapper;
@@ -48,8 +49,11 @@ public class ReviewDbStorageImplementation extends BaseStorage<Review> implement
         jdbc.update(updQ,
                 updReview.getContent()
                 , updReview.getIsPositive()
-                , updReview.getReviewId());
-        return updReview;
+                , updReview.getReviewId()
+        );
+        Review review = findById(updReview.getReviewId()).orElseThrow(() -> new NotFoundException("Отзыв не найден"));
+        System.err.println(review);
+        return review;
     }
 
     @Override
@@ -97,6 +101,7 @@ public class ReviewDbStorageImplementation extends BaseStorage<Review> implement
                 UPDATE REVIEWS SET USEFUL = USEFUL + ? where reviewId = ?
                 """;
         jdbcTemplate.update(usefulQ, useful, reviewId);
+
     }
 
 

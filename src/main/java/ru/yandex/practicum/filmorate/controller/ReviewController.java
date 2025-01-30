@@ -49,26 +49,31 @@ public class ReviewController {
 
     @GetMapping
     public Collection<Review> getReviews(@RequestParam(required = false) Integer filmId, @RequestParam(defaultValue = "10") Integer count) {
+        log.info("Выводим отзывы к фильму c ИД = {} в количестве {}", filmId, count);
         return reviewService.getAll(filmId, count);
     }
 
     @PutMapping("/{id}/like/{userId}")
     public LikeForReview addLike(@PathVariable("id") Integer reviewId, @PathVariable Integer userId) {
+        log.info("Ставим лайк к отзыву с ИД = {} от пользователя с ИД = {}", reviewId, userId);
         return reviewService.like(reviewId, userId, LikeDislike.LIKE);
     }
 
     @PutMapping("/{id}/dislike/{userId}")
     public LikeForReview addDislike(@PathVariable("id") Integer reviewId, @PathVariable Integer userId) {
+        log.info("Ставим дизлайк к отзыву с ИД = {} от пользователя с ИД = {}", reviewId, userId);
         return reviewService.like(reviewId, userId, LikeDislike.DISLIKE);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable("id") Integer reviewId, @PathVariable Integer userId) {
+        log.info("Удаляем лайк у ревью с ИД = {} от пользователя с ИД = {} ", reviewId, userId);
         reviewService.deleteLike(reviewId, userId, LikeDislike.LIKE);
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
     public void deletedislike(@PathVariable("id") Integer reviewId, @PathVariable Integer userId) {
+        log.info("Удаляем дизлайк у ревью с ИД = {} от пользователя с ИД = {} ", reviewId, userId);
         reviewService.deleteLike(reviewId, userId, LikeDislike.DISLIKE);
     }
 

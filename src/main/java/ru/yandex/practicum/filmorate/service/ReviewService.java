@@ -31,6 +31,7 @@ public class ReviewService {
     }
 
     public Review update(Review review) {
+        validateReview(review);
         reviewDbStorage.findById(review.getReviewId()).orElseThrow(() -> new NotFoundException("Отзыв не найден"));
         return reviewDbStorage.update(review);
     }
@@ -68,6 +69,9 @@ public class ReviewService {
         if (review.getIsPositive() == null) {
             throw new ValidationException("Поле IsPositive пустое");
         }
+        if (review.getUseful() == null) {
+            review.setUseful(0);
+        }
         return review;
     }
 
@@ -75,19 +79,20 @@ public class ReviewService {
     public LikeForReview like(Integer reviewId, Integer userId, LikeDislike type) {
         Review review = reviewDbStorage.findById(reviewId).orElseThrow(() -> new NotFoundException("Ревью не найдено"));
         User user = userDbStorage.findUserById(userId).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
-        LikeForReview like = likeDbStorage.getLike(reviewId, userId);
+        LikeForReview like = likeDbStorage.getLike(review.getReviewId(), user.getId());
         if (like != null && type.equals(like.getLikeType())) {
-            throw new UserHaveLike("Пользователь уже поставил лайк к этому отзыву");
+            throw new UserHaveLike("Пользователь уже поставил лайк/дизлайк к этому отзыву");
         } else if (like != null && !type.equals(like.getLikeType())) {
             likeDbStorage.deleteLike(reviewId, userId, like.getLikeType());
         }
         likeDbStorage.like(reviewId, userId, type);
         LikeForReview newLike = likeDbStorage.getLike(reviewId, userId);
 
-        Integer useful;
+        Integer useful = 0;
         if (type.equals(LikeDislike.LIKE)) {
             useful = 1;
-        } else {
+        }
+        if (type.equals(LikeDislike.DISLIKE)) {
             useful = -1;
         }
         reviewDbStorage.setUseful(reviewId, userId, useful);
@@ -99,8 +104,9 @@ public class ReviewService {
     }
 
 
-    public void deleteLike(Integer reviewId, Integer userId, LikeDislike likeType) {
-        LikeForReview likeForReview = likeDbStorage.getLike(reviewId, userId);
-        likeDbStorage.deleteLike(reviewId, userId, likeType);
+    public void deleteLike(Integer reviewId, Integer userId, LikeDislike type) {
+        User user = userDbStorage.findUserById(userId).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        Review review = reviewDbStorage.findById(reviewId).orElseThrow(() -> new NotFoundException("Отзыв не найден"));
+        likeDbStorage.deleteLike(reviewId, user.getId(), type);
     }
 }

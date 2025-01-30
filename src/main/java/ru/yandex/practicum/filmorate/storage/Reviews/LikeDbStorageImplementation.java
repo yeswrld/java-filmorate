@@ -24,24 +24,12 @@ public class LikeDbStorageImplementation extends BaseStorage<LikeForReview> impl
 
     @Override
     public LikeForReview like(Integer reviewId, Integer userId, LikeDislike type) {
-/*        String addLikeDislakeQ = String.format( """
-                INSERT INTO review_likes VALUES (?, ?, '%s')
-                """, type);*/
         String addLikeDislakeQ = String.format("INSERT INTO review_likes VALUES(?,?,'%s')", type);
         update(addLikeDislakeQ, reviewId, userId);
         LikeForReview likeForReview = new LikeForReview();
         likeForReview.setReviewId(reviewId);
         likeForReview.setUserId(userId);
         likeForReview.setLikeType(type);
-  /*      SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbc)
-                .withTableName("review_likes")
-                .usingGeneratedKeyColumns("reviewId");
-        Map<String, Object> param = new HashMap<>();
-        param.put("userId", likeForReview.getUserId());
-        param.put("type", likeForReview.getLikeType());
-        Number reviewId = simpleJdbcInsert.executeAndReturnKey(param);
-        likeForReview.setReviewId(reviewId.intValue());
-        return likeForReview;*/
         return likeForReview;
     }
 
@@ -60,5 +48,9 @@ public class LikeDbStorageImplementation extends BaseStorage<LikeForReview> impl
                 DELETE FROM review_likes WHERE reviewId = ? AND userId = ? AND type = ?
                 """;
         delete(deleteLike, reviewId, userId, likeType.name());
+        String usefulQ = """
+                UPDATE REVIEWS SET USEFUL = USEFUL -1 where reviewId = ?
+                """;
+        jdbcTemplate.update(usefulQ, reviewId);
     }
 }
