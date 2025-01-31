@@ -21,4 +21,6 @@ public interface FilmDbStorage {
     void unLike(Film film, Integer userId);
 
     Collection<Film> findPopularFilms(Integer count);
+
+    Collection<Film> popularWithParams(Integer count, String genreId, String year);
 }

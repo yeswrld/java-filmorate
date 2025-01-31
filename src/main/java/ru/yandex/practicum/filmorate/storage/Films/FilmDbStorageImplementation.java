@@ -120,6 +120,24 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
         return films;
     }
 
+    @Override
+    public Collection<Film> popularWithParams(Integer count, String genreId, String year) {
+        String popularFilmQ = """
+        SELECT f.*,
+               mpa.*,
+               (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) as like_count
+        FROM films f
+        JOIN mpa ON f.mpa_id = mpa.id
+        WHERE EXISTS (SELECT 1 FROM FILMS_GENRES fg WHERE fg.film_id = f.id AND fg.genre_id LIKE ?)
+          AND FORMATDATETIME(f.RELEASE_DATE, 'YYYY') LIKE ?
+        ORDER BY like_count DESC
+        LIMIT ?
+        """;
+
+        List<Film> films = findMany(filmRowMapper, popularFilmQ, genreId, year, count);
+
+        return films;
+    }
 
     private void updateGenres(Film film) {
         String deleteGenresQ = "DELETE FROM FILMS_GENRES WHERE FILM_ID = ?";
