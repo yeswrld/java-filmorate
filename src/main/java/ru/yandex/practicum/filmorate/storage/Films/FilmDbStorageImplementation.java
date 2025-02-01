@@ -4,6 +4,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.service.GenreService;
@@ -67,6 +68,12 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
 
     @Override
     public Film update(Film newFilm) {
+        if (newFilm.getDirectors() == null || newFilm.getDirectors().isEmpty()) {
+            newFilm.setDirectors(List.of(Director.builder()
+                    .id(null)
+                    .build()));
+        }
+
         String updQ = "UPDATE FILMS SET NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, MPA_ID = ?, DIRECTOR_ID = ? WHERE ID = ?";
         jdbc.update(updQ,
                 newFilm.getName(),
@@ -174,4 +181,5 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
         List<Film> films = findMany(filmRowMapper, filmQ, directorId);
         return films;
     }
+
 }
