@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.storage.Mpa.MpaDbStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -32,7 +33,7 @@ public class FilmRowMapper implements RowMapper<Film> {
         film.setMpa(mpaDbStorage.get(rs.getInt("MPA_ID")));
         film.setGenres(List.copyOf(genreService.findFilmGenres(film.getId())));
         if (rs.getObject("DIRECTOR_ID", Integer.class) == null) {
-            film.setDirectors(null);
+            film.setDirectors(new ArrayList<>());
         } else {
             Director director = Director.builder()
                     .id(rs.getInt("DIRECTOR_ID"))

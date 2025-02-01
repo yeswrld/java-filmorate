@@ -124,13 +124,6 @@ public class FilmService {
         if (!mpaService.mpaExists(film.getMpa().getId())) {
             oldFilm.setMpa(film.getMpa());
         }
-        if (film.getDirectors() == null || film.getDirectors().isEmpty()) {
-            oldFilm.setDirectors(List.of(Director.builder()
-                    .id(null)
-                    .build()));
-
-            throw new ValidationException("Режиссер не задан.");
-        }
         oldFilm.setGenres(film.getGenres());
 
         return oldFilm;
@@ -147,7 +140,7 @@ public class FilmService {
                     .collect(Collectors.toList());
         } else if (sorBy.equals("year")) {
             return films.stream()
-                    .sorted(explicitComparator.reversed())
+                    .sorted(explicitComparator)
                     .collect(Collectors.toList());
         } else {
             throw new ValidationException("Некоректный параметр сортировки.");
