@@ -33,7 +33,12 @@ private final DirectorDbStorage directorDbStorage;
     }
 
     public Director update(Director newDirector) {
-        return directorDbStorage.update(newDirector);
+        if (!directorDbStorage.directorsExist(newDirector.getId())) {
+            log.info("Нельзя обновить: Режиссер не найден");
+            throw new NotFoundException("Режиссер не найден");
+        } else {
+            return directorDbStorage.update(newDirector);
+        }
     }
 
     public void removeById(Integer id) {

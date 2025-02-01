@@ -24,7 +24,7 @@ release_date date,
 duration INTEGER,
 mpa_id INTEGER REFERENCES mpa(id),
 director_id INTEGER REFERENCES directors(id)
-)
+);
 
 CREATE TABLE IF NOT EXISTS genres
 (

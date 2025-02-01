@@ -23,7 +23,7 @@ public class DirectorController {
         return directorService.findById(id);
     }
 
-
+    @GetMapping
     public Collection<Director> findAll() {
         log.info("Выводим всех режиссеров с базы");
         return directorService.findAll();

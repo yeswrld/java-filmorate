@@ -54,7 +54,11 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
         param.put("release_date", film.getReleaseDate());
         param.put("duration", film.getDuration());
         param.put("MPA_ID", film.getMpa().getId());
-        param.put("DIRECTOR_ID", film.getDirector().getId());
+        if (!film.getDirectors().isEmpty()) {
+            param.put("DIRECTOR_ID", film.getDirectors().getFirst().getId());
+        } else {
+            param.put("DIRECTOR_ID", null);
+        }
         Number filmId = simpleJdbcInsert.executeAndReturnKey(param);
         film.setId(filmId.intValue());
         updateGenres(film);
@@ -70,8 +74,9 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
                 newFilm.getReleaseDate(),
                 newFilm.getDuration(),
                 newFilm.getMpa().getId(),
-                newFilm.getId(),
-                newFilm.getDirector().getId()
+                newFilm.getDirectors().getFirst().getId(),
+                newFilm.getId()
+
         );
         updateGenres(newFilm);
         return newFilm;
@@ -108,14 +113,14 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
     public Collection<Film> findPopularFilms(Integer count) {
 
         String popularFilmQ = """
-        SELECT f.*,
-               mpa.*,
-               (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) as like_count
-        FROM films f
-        JOIN mpa ON f.mpa_id = mpa.id
-        ORDER BY like_count DESC
-        LIMIT ?
-        """;
+                SELECT f.*,
+                       mpa.*,
+                       (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) as like_count
+                FROM films f
+                JOIN mpa ON f.mpa_id = mpa.id
+                ORDER BY like_count DESC
+                LIMIT ?
+                """;
 
         List<Film> films = findMany(filmRowMapper, popularFilmQ, count);
 
@@ -125,16 +130,16 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
     @Override
     public Collection<Film> popularWithParams(Integer count, String genreId, String year) {
         String popularFilmQ = """
-        SELECT f.*,
-               mpa.*,
-               (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) as like_count
-        FROM films f
-        JOIN mpa ON f.mpa_id = mpa.id
-        WHERE EXISTS (SELECT 1 FROM FILMS_GENRES fg WHERE fg.film_id = f.id AND fg.genre_id LIKE ?)
-          AND FORMATDATETIME(f.RELEASE_DATE, 'YYYY') LIKE ?
-        ORDER BY like_count DESC
-        LIMIT ?
-        """;
+                SELECT f.*,
+                       mpa.*,
+                       (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) as like_count
+                FROM films f
+                JOIN mpa ON f.mpa_id = mpa.id
+                WHERE EXISTS (SELECT 1 FROM FILMS_GENRES fg WHERE fg.film_id = f.id AND fg.genre_id LIKE ?)
+                  AND FORMATDATETIME(f.RELEASE_DATE, 'YYYY') LIKE ?
+                ORDER BY like_count DESC
+                LIMIT ?
+                """;
 
         List<Film> films = findMany(filmRowMapper, popularFilmQ, genreId, year, count);
 
@@ -160,4 +165,13 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
         }
     }
 
+    public Collection<Film> sortedDirectorID(Integer directorId) {
+        String FilmQ = """
+                SELECT f.*,
+                FROM films f
+                WHERE f.DIRECTOR_ID = ?
+                """;
+        List<Film> films = findMany(filmRowMapper, FilmQ, directorId);
+        return films;
+    }
 }
