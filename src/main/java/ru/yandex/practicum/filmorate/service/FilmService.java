@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.Films.FilmDbStorage;
@@ -124,6 +125,10 @@ public class FilmService {
             oldFilm.setMpa(film.getMpa());
         }
         if (film.getDirectors() == null || film.getDirectors().isEmpty()) {
+            oldFilm.setDirectors(List.of(Director.builder()
+                    .id(null)
+                    .build()));
+
             throw new ValidationException("Режиссер не задан.");
         }
         oldFilm.setGenres(film.getGenres());
