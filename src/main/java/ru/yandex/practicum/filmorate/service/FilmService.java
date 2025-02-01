@@ -5,12 +5,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.Event.EventOperation;
+import ru.yandex.practicum.filmorate.model.Event.EventType;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.storage.Events.EventDbStorage;
 import ru.yandex.practicum.filmorate.storage.Films.FilmDbStorage;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -22,7 +27,7 @@ public class FilmService {
     private final GenreService genreService;
     private final MpaService mpaService;
     private final UserService userService;
-    private final Map<Integer, Film> films = new HashMap<>();
+    private final EventDbStorage eventDbStorage;
 
     public Collection<Film> findAll() {
         return filmDbStorage.findAll();
@@ -53,11 +58,13 @@ public class FilmService {
     public void addLike(Integer id, Integer userId) {
         userService.userInDbExist(userId);
         filmDbStorage.setLike(filmDbStorage.findById(id).orElseThrow(() -> new NotFoundException("Фильм не найден")), userId);
+        eventDbStorage.add(EventType.LIKE, EventOperation.ADD, userId, id);
     }
 
     public void deleteLike(Integer id, Integer userId) {
         userService.userInDbExist(userId);
         filmDbStorage.unLike(filmDbStorage.findById(id).orElseThrow(() -> new NotFoundException("Фильм не найден")), userId);
+        eventDbStorage.add(EventType.LIKE, EventOperation.REMOVE, userId, id);
     }
 
     public Collection<Film> findPopularFilm(Integer count) {

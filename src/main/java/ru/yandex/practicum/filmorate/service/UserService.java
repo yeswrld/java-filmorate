@@ -5,7 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.Event.Event;
+import ru.yandex.practicum.filmorate.model.Event.EventOperation;
+import ru.yandex.practicum.filmorate.model.Event.EventType;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.Events.EventDbStorage;
 import ru.yandex.practicum.filmorate.storage.Users.UserDbStorage;
 
 import java.time.LocalDate;
@@ -19,6 +23,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UserService {
     private final UserDbStorage userDbStorage;
+    private final EventDbStorage eventDbStorage;
 
     public Collection<User> findAll() {
         return userDbStorage.findAll();
@@ -93,12 +98,14 @@ public class UserService {
     public void addFriend(Integer userA, Integer userB) {
         if (userInDbExist(userA) != null && userInDbExist(userB) != null) {
             userDbStorage.addFriend(userA, userB);
+            eventDbStorage.add(EventType.FRIEND, EventOperation.ADD, userA, userB);
         }
     }
 
     public void deleteFriend(Integer userA, Integer userB) {
         if (userInDbExist(userA) != null && userInDbExist(userB) != null) {
             userDbStorage.deleteFriend(userA, userB);
+            eventDbStorage.add(EventType.FRIEND, EventOperation.REMOVE, userA, userB);
         }
     }
 
@@ -109,6 +116,10 @@ public class UserService {
         return new HashSet<>(userDbStorage.getCommonFriends(userA, userB));
     }
 
+    public Collection<Event> getFeed(Integer userId) {
+        userInDbExist(userId);
+        return eventDbStorage.getAll(userId);
+    }
 
     public User userInDbExist(Integer id) {
         Optional<User> user = userDbStorage.findUserById(id);

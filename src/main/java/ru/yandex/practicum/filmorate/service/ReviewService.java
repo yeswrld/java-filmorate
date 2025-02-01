@@ -6,10 +6,13 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.UserHaveLike;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.Event.EventOperation;
+import ru.yandex.practicum.filmorate.model.Event.EventType;
 import ru.yandex.practicum.filmorate.model.LikeDislike;
 import ru.yandex.practicum.filmorate.model.LikeForReview;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.Events.EventDbStorage;
 import ru.yandex.practicum.filmorate.storage.Reviews.LikeDbStorage;
 import ru.yandex.practicum.filmorate.storage.Reviews.ReviewDbStorage;
 import ru.yandex.practicum.filmorate.storage.Users.UserDbStorage;
@@ -23,16 +26,19 @@ public class ReviewService {
     private final ReviewDbStorage reviewDbStorage;
     private final LikeDbStorage likeDbStorage;
     private final UserDbStorage userDbStorage;
+    private final EventDbStorage eventDbStorage;
 
     public Review add(Review review) {
         validateReview(review);
         reviewDbStorage.add(review);
+        eventDbStorage.add(EventType.REVIEW, EventOperation.ADD, review.getUserId(), review.getReviewId());
         return review;
     }
 
     public Review update(Review review) {
         validateReview(review);
         reviewDbStorage.findById(review.getReviewId()).orElseThrow(() -> new NotFoundException("Отзыв не найден"));
+        eventDbStorage.add(EventType.REVIEW, EventOperation.UPDATE, review.getUserId(), review.getReviewId());
         return reviewDbStorage.update(review);
     }
 
@@ -43,6 +49,7 @@ public class ReviewService {
     public Review delete(Integer id) {
         Review deletedReview = reviewDbStorage.findById(id).orElseThrow(() -> new NotFoundException("Отзыв не найден"));
         reviewDbStorage.delete(id);
+        eventDbStorage.add(EventType.REVIEW, EventOperation.REMOVE, deletedReview.getUserId(), deletedReview.getReviewId());
         return deletedReview;
     }
 
