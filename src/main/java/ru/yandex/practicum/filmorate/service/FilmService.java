@@ -64,6 +64,10 @@ public class FilmService {
         return filmDbStorage.findPopularFilms(count);
     }
 
+    public Collection<Film> popularWithParams(Integer count, String genreId, String year) {
+        return filmDbStorage.popularWithParams(count, genreId, year);
+    }
+
     private Film filmValidate(Film film) {
         if (film.getName().isBlank()) {
             log.info("Название фильма пустое");
