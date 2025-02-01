@@ -166,12 +166,12 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
     }
 
     public Collection<Film> sortedDirectorID(Integer directorId) {
-        String FilmQ = """
+        String filmQ = """
                 SELECT f.*,
                 FROM films f
                 WHERE f.DIRECTOR_ID = ?
                 """;
-        List<Film> films = findMany(filmRowMapper, FilmQ, directorId);
+        List<Film> films = findMany(filmRowMapper, filmQ, directorId);
         return films;
     }
 }
