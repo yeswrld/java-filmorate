@@ -123,7 +123,11 @@ public class FilmService {
         if (!mpaService.mpaExists(film.getMpa().getId())) {
             oldFilm.setMpa(film.getMpa());
         }
+        if (film.getDirectors() == null || film.getDirectors().isEmpty()) {
+            throw new ValidationException("Режиссер не задан.");
+        }
         oldFilm.setGenres(film.getGenres());
+
         return oldFilm;
     }
 
