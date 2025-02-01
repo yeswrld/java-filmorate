@@ -55,10 +55,12 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
         param.put("release_date", film.getReleaseDate());
         param.put("duration", film.getDuration());
         param.put("MPA_ID", film.getMpa().getId());
-        if (!film.getDirectors().isEmpty()) {
-            param.put("DIRECTOR_ID", film.getDirectors().getFirst().getId());
-        } else {
+        if (film.getDirectors() == null) {
             param.put("DIRECTOR_ID", null);
+        } else if (film.getDirectors().isEmpty()) {
+            param.put("DIRECTOR_ID",null);
+        } else {
+            param.put("DIRECTOR_ID", film.getDirectors().getFirst().getId());
         }
         Number filmId = simpleJdbcInsert.executeAndReturnKey(param);
         film.setId(filmId.intValue());
