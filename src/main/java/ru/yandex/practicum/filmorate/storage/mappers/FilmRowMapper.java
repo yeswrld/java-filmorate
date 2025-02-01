@@ -33,7 +33,7 @@ public class FilmRowMapper implements RowMapper<Film> {
         film.setMpa(mpaDbStorage.get(rs.getInt("MPA_ID")));
         film.setGenres(List.copyOf(genreService.findFilmGenres(film.getId())));
         if (rs.getObject("DIRECTOR_ID", Integer.class) == null) {
-            film.setDirectors(new ArrayList<>());
+            film.setDirectors(null);
         } else {
             Director director = Director.builder()
                     .id(rs.getInt("DIRECTOR_ID"))
