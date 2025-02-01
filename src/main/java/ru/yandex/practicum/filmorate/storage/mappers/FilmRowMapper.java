@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.GenreService;
+import ru.yandex.practicum.filmorate.storage.Directors.DirectorDbStorage;
 import ru.yandex.practicum.filmorate.storage.Likes.LikesDbStorage;
 import ru.yandex.practicum.filmorate.storage.Mpa.MpaDbStorage;
 
@@ -18,7 +19,7 @@ public class FilmRowMapper implements RowMapper<Film> {
     private final MpaDbStorage mpaDbStorage;
     private final LikesDbStorage likesDbStorage;
     private final GenreService genreService;
-
+private final DirectorDbStorage directorDbStorage;
     @Override
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
         Film film = new Film();
@@ -30,6 +31,7 @@ public class FilmRowMapper implements RowMapper<Film> {
         film.getLikes().addAll(likesDbStorage.getUsersLikes(film.getId()));
         film.setMpa(mpaDbStorage.get(rs.getInt("MPA_ID")));
         film.setGenres(List.copyOf(genreService.findFilmGenres(film.getId())));
+        film.setDirector(directorDbStorage.findById(rs.getInt("DIRECTOR_ID")));
         return film;
     }
 }

@@ -1,0 +1,47 @@
+package ru.yandex.practicum.filmorate.service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.storage.Directors.DirectorDbStorage;
+
+import java.util.Collection;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class DirectorService {
+private final DirectorDbStorage directorDbStorage;
+
+    public Director findById(Integer id) {
+        if (!directorDbStorage.directorsExist(id)) {
+            log.info("Режиссер не найден");
+            throw new NotFoundException("Режиссер не найден");
+        } else {
+          return   directorDbStorage.findById(id);
+        }
+    }
+
+    public Collection<Director> findAll() {
+       return directorDbStorage.findAll();
+    }
+
+    public Director create(Director director) {
+        return directorDbStorage.create(director);
+    }
+
+    public Director update(Director newDirector) {
+        return directorDbStorage.update(newDirector);
+    }
+
+    public void removeById(Integer id) {
+        if (!directorDbStorage.directorsExist(id)) {
+            log.info("Нельзя удалить: Режиссер не найден");
+            throw new NotFoundException("Режиссер не найден");
+        } else {
+            directorDbStorage.removeById(id);
+        }
+    }
+}

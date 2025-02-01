@@ -27,7 +27,7 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
 
     @Override
     public Optional<Film> findById(Integer id) {
-        String findById = "SELECT ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA_ID FROM FILMS WHERE ID = ?";
+        String findById = "SELECT ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA_ID, DIRECTOR_ID FROM FILMS WHERE ID = ?";
         try {
             Film result = findOne(filmRowMapper, findById, id);
             return Optional.ofNullable(result);
@@ -54,6 +54,7 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
         param.put("release_date", film.getReleaseDate());
         param.put("duration", film.getDuration());
         param.put("MPA_ID", film.getMpa().getId());
+        param.put("DIRECTOR_ID", film.getDirector().getId());
         Number filmId = simpleJdbcInsert.executeAndReturnKey(param);
         film.setId(filmId.intValue());
         updateGenres(film);
@@ -62,14 +63,15 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
 
     @Override
     public Film update(Film newFilm) {
-        String updQ = "UPDATE FILMS SET NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, MPA_ID = ? WHERE ID = ?";
+        String updQ = "UPDATE FILMS SET NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, MPA_ID = ?, DIRECTOR_ID = ? WHERE ID = ?";
         jdbc.update(updQ,
                 newFilm.getName(),
                 newFilm.getDescription(),
                 newFilm.getReleaseDate(),
                 newFilm.getDuration(),
                 newFilm.getMpa().getId(),
-                newFilm.getId()
+                newFilm.getId(),
+                newFilm.getDirector().getId()
         );
         updateGenres(newFilm);
         return newFilm;
