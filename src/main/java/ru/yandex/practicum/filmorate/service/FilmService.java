@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.storage.Films.FilmDbStorage;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -123,8 +124,29 @@ public class FilmService {
             oldFilm.setMpa(film.getMpa());
         }
         oldFilm.setGenres(film.getGenres());
+
         return oldFilm;
     }
+
+
+    public Collection<Film> sortedDirectorID(Integer directorID, String sorBy) {
+        Comparator<Film> explicitComparator2 = (film1, film2) -> film1.getLikes().size() - film2.getLikes().size();
+        Comparator<Film> explicitComparator = (film1, film2) -> film1.getReleaseDate().compareTo(film2.getReleaseDate());
+        Collection<Film> films = filmDbStorage.sortedDirectorID(directorID);
+        if (sorBy.equals("likes")) {
+            return films.stream()
+                    .sorted(explicitComparator2.reversed())
+                    .collect(Collectors.toList());
+        } else if (sorBy.equals("year")) {
+            return films.stream()
+                    .sorted(explicitComparator)
+                    .collect(Collectors.toList());
+        } else {
+            throw new ValidationException("Некоректный параметр сортировки.");
+        }
+
+    }
+
 
     public Collection<Film> getCommon(Integer userId, Integer friendId) {
         return filmDbStorage.getCommon(userId, friendId);

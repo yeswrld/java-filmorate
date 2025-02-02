@@ -20,7 +20,7 @@ public class Film {
     private Set<Integer> likes = new HashSet<>();
     private Mpa mpa;
     private List<Genre> genres;
-
+    private List<Director> directors;
 
 }
 
