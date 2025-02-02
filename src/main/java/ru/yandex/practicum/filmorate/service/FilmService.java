@@ -126,4 +126,7 @@ public class FilmService {
         return oldFilm;
     }
 
+    public Collection<Film> getCommon(Integer userId, Integer friendId) {
+        return filmDbStorage.getCommon(userId, friendId);
+    }
 }
