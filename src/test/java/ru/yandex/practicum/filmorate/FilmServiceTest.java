@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.Films.FilmDbStorage;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,6 +43,7 @@ public class FilmServiceTest {
         film.setDuration(90);
         film.setMpa(mpa);
         film.setGenres(genres);
+        film.setDirectors(new ArrayList<>());
         Film filmFromDb = filmDbStorage.findById(1).orElseThrow(() -> new NotFoundException("Фильм не найден"));
         Assertions.assertEquals(film, filmFromDb);
     }
