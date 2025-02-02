@@ -32,13 +32,11 @@ public class FilmRowMapper implements RowMapper<Film> {
         film.getLikes().addAll(likesDbStorage.getUsersLikes(film.getId()));
         film.setMpa(mpaDbStorage.get(rs.getInt("MPA_ID")));
         film.setGenres(List.copyOf(genreService.findFilmGenres(film.getId())));
-        if (rs.getObject("DIRECTOR_ID", Integer.class) == null) {
-            film.setDirectors(null);
-        } else if (rs.getInt("DIRECTOR_ID") == -1) {
+        if (rs.getObject("Dr", Integer.class) == null) {
             film.setDirectors(new ArrayList<>());
         } else {
             Director director = Director.builder()
-                    .id(rs.getInt("DIRECTOR_ID"))
+                    .id(rs.getInt("Dr"))
                     .build();
             film.setDirectors(List.of(director));
         }

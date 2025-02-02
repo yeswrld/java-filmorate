@@ -28,7 +28,7 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
 
     @Override
     public Optional<Film> findById(Integer id) {
-        String findById = "SELECT ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA_ID, DIRECTOR_ID FROM FILMS WHERE ID = ?";
+        String findById = "SELECT ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA_ID, DIRECTOR_ID as Dr FROM FILMS WHERE  ID = ?";
         try {
             Film result = findOne(filmRowMapper, findById, id);
             return Optional.ofNullable(result);
@@ -57,9 +57,7 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
         param.put("MPA_ID", film.getMpa().getId());
         if (film.getDirectors() == null) {
             param.put("DIRECTOR_ID", null);
-        } else if (film.getDirectors().isEmpty()) {
-            param.put("DIRECTOR_ID",null);
-        } else {
+        } else if (!film.getDirectors().isEmpty()) {
             param.put("DIRECTOR_ID", film.getDirectors().getFirst().getId());
         }
         Number filmId = simpleJdbcInsert.executeAndReturnKey(param);
