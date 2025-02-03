@@ -139,9 +139,11 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
         String popularFilmQ = """
                 SELECT f.*,
                        mpa.*,
+                       d.name as DIRECTOR_NAME,
                        (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) as like_count
                 FROM films f
                 JOIN mpa ON f.mpa_id = mpa.id
+                LEFT JOIN directors d ON f.director_id = d.id
                 WHERE EXISTS (SELECT 1 FROM FILMS_GENRES fg WHERE fg.film_id = f.id AND fg.genre_id LIKE ?)
                   AND FORMATDATETIME(f.RELEASE_DATE, 'YYYY') LIKE ?
                 ORDER BY like_count DESC

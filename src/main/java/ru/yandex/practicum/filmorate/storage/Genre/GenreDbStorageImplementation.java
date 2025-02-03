@@ -53,11 +53,12 @@ public class GenreDbStorageImplementation implements GenreDbStorage {
     @Override
     public List<Genre> findFilmGenres(Integer filmID) {
         String filmGenresQ = """
-                SELECT g.ID, g.NAME
+                SELECT DISTINCT g.ID, g.NAME
                 FROM GENRES g
                 JOIN FILMS_GENRES fg ON g.ID = FG.GENRE_ID
                 WHERE fg.film_id IN (?)
                 """;
-        return jdbc.query(filmGenresQ, new GenreRowMapper(), filmID);
+        List<Genre> genres = jdbc.query(filmGenresQ, new GenreRowMapper(), filmID);
+        return genres;
     }
 }
