@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Event.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.RecommendationService;
@@ -88,6 +89,12 @@ public class UserController {
     public List<Film> getRecommendations(@PathVariable Integer id) {
         log.info("Получен запрос рекомендаций для пользователя с ИД = {}", id);
         return recommendationService.getRecommendations(id);
+    }
+
+    @GetMapping("/{id}/feed")
+    public Collection<Event> getFeed(@PathVariable Integer id) {
+        log.info("Получен запрос ленту событий для пользователя с ИД = {}", id);
+        return userService.getFeed(id);
     }
 
 }

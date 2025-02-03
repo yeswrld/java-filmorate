@@ -7,12 +7,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.Likes.LikesDbStorage;
 
-import java.util.List;
-import java.util.Set;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.ArrayList;
-import java.util.Objects;
+import java.util.*;
 
 @Slf4j
 @Service
