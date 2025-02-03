@@ -22,7 +22,6 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
     private final FilmSearchRowMapper filmSearchRowMapper;
 
 
-
     public FilmDbStorageImplementation(JdbcTemplate jdbc, FilmRowMapper filmRowMapper, GenreService genreService, FilmSearchRowMapper filmSearchRowMapper) {
         super(jdbc);
         this.filmRowMapper = filmRowMapper;
@@ -187,52 +186,52 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
     @Override
     public Collection<Film> getCommon(Integer userId, Integer friendId) {
         String popularFilmQ = """
-        SELECT f.*,
-               mpa.*,
-               (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) as like_count
-        FROM films f
-        JOIN mpa ON f.mpa_id = mpa.id
-        JOIN likes l1 ON l1.film_id = f.id AND l1.user_id = ?
-        JOIN likes l2 ON l2.film_id = f.id AND l2.user_id = ?
-        ORDER BY like_count DESC
-        """;
+                SELECT f.*,
+                       mpa.*,
+                       (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) as like_count
+                FROM films f
+                JOIN mpa ON f.mpa_id = mpa.id
+                JOIN likes l1 ON l1.film_id = f.id AND l1.user_id = ?
+                JOIN likes l2 ON l2.film_id = f.id AND l2.user_id = ?
+                ORDER BY like_count DESC
+                """;
 
         return findMany(filmRowMapper, popularFilmQ, userId, friendId);
     }
-}
+
     @Override
     public Collection<Film> searchFilms(String query, String by) {
         String sql;
         Object[] params;
         if (by.equalsIgnoreCase("title")) {
             sql = "SELECT f.*, mpa.*, " +
-                    "       NULL as director_id, " +
-                    "       NULL as director_name " +
-                    "FROM films f " +
-                    "JOIN mpa ON f.mpa_id = mpa.id " +
-                    "WHERE LOWER(f.name) LIKE LOWER(CONCAT('%', ?, '%')) " +
-                    "ORDER BY (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) DESC";
+                  "       NULL as director_id, " +
+                  "       NULL as director_name " +
+                  "FROM films f " +
+                  "JOIN mpa ON f.mpa_id = mpa.id " +
+                  "WHERE LOWER(f.name) LIKE LOWER(CONCAT('%', ?, '%')) " +
+                  "ORDER BY (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) DESC";
             params = new Object[]{query};
         } else if (by.equalsIgnoreCase("director")) {
             sql = "SELECT f.*, mpa.*, " +
-                    "       d.id as director_id, " +
-                    "       d.name as director_name " +
-                    "FROM films f " +
-                    "JOIN mpa ON f.mpa_id = mpa.id " +
-                    "JOIN directors d ON f.DIRECTOR_ID = d.id " +
-                    "WHERE LOWER(d.name) LIKE LOWER(CONCAT('%', ?, '%')) " +
-                    "ORDER BY (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) DESC";
+                  "       d.id as director_id, " +
+                  "       d.name as director_name " +
+                  "FROM films f " +
+                  "JOIN mpa ON f.mpa_id = mpa.id " +
+                  "JOIN directors d ON f.DIRECTOR_ID = d.id " +
+                  "WHERE LOWER(d.name) LIKE LOWER(CONCAT('%', ?, '%')) " +
+                  "ORDER BY (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) DESC";
             params = new Object[]{query};
         } else if (by.equalsIgnoreCase("director,title") || by.equalsIgnoreCase("title,director")) {
             sql = "SELECT f.*, mpa.*, " +
-                    "       d.id as director_id, " +
-                    "       d.name as director_name " +
-                    "FROM films f " +
-                    "JOIN mpa ON f.mpa_id = mpa.id " +
-                    "LEFT JOIN directors d ON f.DIRECTOR_ID = d.id " +
-                    "WHERE LOWER(f.name) LIKE LOWER(CONCAT('%', ?, '%')) " +
-                    "   OR LOWER(d.name) LIKE LOWER(CONCAT('%', ?, '%')) " +
-                    "ORDER BY (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) DESC";
+                  "       d.id as director_id, " +
+                  "       d.name as director_name " +
+                  "FROM films f " +
+                  "JOIN mpa ON f.mpa_id = mpa.id " +
+                  "LEFT JOIN directors d ON f.DIRECTOR_ID = d.id " +
+                  "WHERE LOWER(f.name) LIKE LOWER(CONCAT('%', ?, '%')) " +
+                  "   OR LOWER(d.name) LIKE LOWER(CONCAT('%', ?, '%')) " +
+                  "ORDER BY (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) DESC";
             params = new Object[]{query, query};
         } else {
             throw new IllegalArgumentException("Некорректное значение параметра by");

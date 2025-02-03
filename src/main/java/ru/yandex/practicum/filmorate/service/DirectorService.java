@@ -13,19 +13,19 @@ import java.util.Collection;
 @Service
 @RequiredArgsConstructor
 public class DirectorService {
-private final DirectorDbStorage directorDbStorage;
+    private final DirectorDbStorage directorDbStorage;
 
     public Director findById(Integer id) {
         if (!directorDbStorage.directorsExist(id)) {
             log.info("Режиссер не найден");
             throw new NotFoundException("Режиссер не найден");
         } else {
-          return   directorDbStorage.findById(id);
+            return directorDbStorage.findById(id);
         }
     }
 
     public Collection<Director> findAll() {
-       return directorDbStorage.findAll();
+        return directorDbStorage.findAll();
     }
 
     public Director create(Director director) {

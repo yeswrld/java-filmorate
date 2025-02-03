@@ -26,7 +26,7 @@ public interface FilmDbStorage {
 
     Collection<Film> getCommon(Integer userId, Integer friendId);
 
-    public Collection<Film> sortedDirectorID(Integer directorId);
+    Collection<Film> sortedDirectorID(Integer directorId);
 
     Collection<Film> searchFilms(String query, String by);
 }

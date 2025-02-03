@@ -15,7 +15,7 @@ public interface DirectorDbStorage {
 
     void removeById(Integer id);
 
-    public boolean directorsExist(Integer id);
+    boolean directorsExist(Integer id);
 
 
 }

@@ -13,7 +13,10 @@ import ru.yandex.practicum.filmorate.storage.Events.EventDbStorage;
 import ru.yandex.practicum.filmorate.storage.Films.FilmDbStorage;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -156,6 +159,7 @@ public class FilmService {
     public Collection<Film> getCommon(Integer userId, Integer friendId) {
         return filmDbStorage.getCommon(userId, friendId);
     }
+
     public Collection<Film> searchFilms(String query, String by) {
         return filmDbStorage.searchFilms(query, by);
     }
