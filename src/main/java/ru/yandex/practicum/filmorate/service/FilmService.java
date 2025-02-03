@@ -42,8 +42,8 @@ public class FilmService {
     }
 
     public Film update(Film film) {
-        filmValidateForUpdate(film);
-        Film updFilm = filmDbStorage.update(film);
+        Film updFilm = filmValidateForUpdate(film);
+        filmDbStorage.update(film);
         return updFilm;
     }
 
@@ -131,8 +131,15 @@ public class FilmService {
         if (!mpaService.mpaExists(film.getMpa().getId())) {
             oldFilm.setMpa(film.getMpa());
         }
-        oldFilm.setGenres(film.getGenres());
-
+        if (film.getGenres() != null) {
+            List<Genre> genres = new ArrayList<>();
+            for (int i = 0; i < film.getGenres().size(); i++) {
+                if (!genres.contains(film.getGenres().get(i))) {
+                    genres.add(film.getGenres().get(i));
+                }
+            }
+            oldFilm.setGenres(genres);
+        }
         return oldFilm;
     }
 
