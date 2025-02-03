@@ -185,6 +185,7 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
         List<Film> films = findMany(filmRowMapper, filmQ, directorId);
         return films;
     }
+    
     @Override
     public Collection<Film> searchFilms(String query, String by) {
         String sql;
