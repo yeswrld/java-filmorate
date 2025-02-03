@@ -147,5 +147,7 @@ public class FilmService {
 
     }
 
-
+    public Collection<Film> searchFilms(String query, String by) {
+        return filmDbStorage.searchFilms(query, by);
+    }
 }

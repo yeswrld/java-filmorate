@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.service.GenreService;
 import ru.yandex.practicum.filmorate.storage.BaseStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.FilmRowMapper;
+import ru.yandex.practicum.filmorate.storage.mappers.FilmSearchRowMapper;
 
 import java.util.*;
 
@@ -18,12 +19,15 @@ import java.util.*;
 public class FilmDbStorageImplementation extends BaseStorage<Film> implements FilmDbStorage {
     private final FilmRowMapper filmRowMapper;
     private final GenreService genreService;
+    private final FilmSearchRowMapper filmSearchRowMapper;
 
 
-    public FilmDbStorageImplementation(JdbcTemplate jdbc, FilmRowMapper filmRowMapper, GenreService genreService) {
+
+    public FilmDbStorageImplementation(JdbcTemplate jdbc, FilmRowMapper filmRowMapper, GenreService genreService, FilmSearchRowMapper filmSearchRowMapper) {
         super(jdbc);
         this.filmRowMapper = filmRowMapper;
         this.genreService = genreService;
+        this.filmSearchRowMapper = filmSearchRowMapper;
     }
 
     @Override
@@ -180,6 +184,45 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
                 """;
         List<Film> films = findMany(filmRowMapper, filmQ, directorId);
         return films;
+    }
+    @Override
+    public Collection<Film> searchFilms(String query, String by) {
+        String sql;
+        Object[] params;
+        if (by.equalsIgnoreCase("title")) {
+            sql = "SELECT f.*, mpa.*, " +
+                    "       NULL as director_id, " +
+                    "       NULL as director_name " +
+                    "FROM films f " +
+                    "JOIN mpa ON f.mpa_id = mpa.id " +
+                    "WHERE LOWER(f.name) LIKE LOWER(CONCAT('%', ?, '%')) " +
+                    "ORDER BY (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) DESC";
+            params = new Object[]{query};
+        } else if (by.equalsIgnoreCase("director")) {
+            sql = "SELECT f.*, mpa.*, " +
+                    "       d.id as director_id, " +
+                    "       d.name as director_name " +
+                    "FROM films f " +
+                    "JOIN mpa ON f.mpa_id = mpa.id " +
+                    "JOIN directors d ON f.DIRECTOR_ID = d.id " +
+                    "WHERE LOWER(d.name) LIKE LOWER(CONCAT('%', ?, '%')) " +
+                    "ORDER BY (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) DESC";
+            params = new Object[]{query};
+        } else if (by.equalsIgnoreCase("director,title") || by.equalsIgnoreCase("title,director")) {
+            sql = "SELECT f.*, mpa.*, " +
+                    "       d.id as director_id, " +
+                    "       d.name as director_name " +
+                    "FROM films f " +
+                    "JOIN mpa ON f.mpa_id = mpa.id " +
+                    "LEFT JOIN directors d ON f.DIRECTOR_ID = d.id " +
+                    "WHERE LOWER(f.name) LIKE LOWER(CONCAT('%', ?, '%')) " +
+                    "   OR LOWER(d.name) LIKE LOWER(CONCAT('%', ?, '%')) " +
+                    "ORDER BY (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) DESC";
+            params = new Object[]{query, query};
+        } else {
+            throw new IllegalArgumentException("Некорректное значение параметра by");
+        }
+        return findMany(filmSearchRowMapper, sql, params);
     }
 
 }

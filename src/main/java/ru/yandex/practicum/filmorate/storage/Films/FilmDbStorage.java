@@ -25,4 +25,6 @@ public interface FilmDbStorage {
     Collection<Film> popularWithParams(Integer count, String genreId, String year);
 
     public Collection<Film> sortedDirectorID(Integer directorId);
+
+    Collection<Film> searchFilms(String query, String by);
 }
