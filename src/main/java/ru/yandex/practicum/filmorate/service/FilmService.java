@@ -156,4 +156,7 @@ public class FilmService {
     public Collection<Film> getCommon(Integer userId, Integer friendId) {
         return filmDbStorage.getCommon(userId, friendId);
     }
+    public Collection<Film> searchFilms(String query, String by) {
+        return filmDbStorage.searchFilms(query, by);
+    }
 }

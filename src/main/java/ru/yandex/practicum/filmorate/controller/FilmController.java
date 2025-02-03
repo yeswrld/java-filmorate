@@ -77,12 +77,17 @@ public class FilmController {
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable Integer id,
-                          @PathVariable Integer userId) {
+                           @PathVariable Integer userId) {
         log.info("Удаляем лайк у фильма {} от пользователя {}", id, userId);
         filmService.deleteLike(id, userId);
         log.info("Лайк успешно удален");
     }
 
+    @GetMapping("/search")
+    public Collection<Film> searchFilms(@RequestParam String query, @RequestParam String by) {
+        log.info("Поиск фильмов по запросу '{}' по полям '{}'", query, by);
+        return filmService.searchFilms(query, by);
+    }
     @GetMapping("/common")
     public Collection<Film> getCommon(@RequestParam Integer userId,
                                       @RequestParam Integer friendId) {
