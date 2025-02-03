@@ -148,9 +148,7 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
                 LIMIT ?
                 """;
 
-        List<Film> films = findMany(filmRowMapper, popularFilmQ, genreId, year, count);
-
-        return films;
+        return findMany(filmRowMapper, popularFilmQ, genreId, year, count);
     }
 
     private void updateGenres(Film film) {
@@ -182,4 +180,19 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
         return films;
     }
 
+    @Override
+    public Collection<Film> getCommon(Integer userId, Integer friendId) {
+        String popularFilmQ = """
+        SELECT f.*,
+               mpa.*,
+               (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) as like_count
+        FROM films f
+        JOIN mpa ON f.mpa_id = mpa.id
+        JOIN likes l1 ON l1.film_id = f.id AND l1.user_id = ?
+        JOIN likes l2 ON l2.film_id = f.id AND l2.user_id = ?
+        ORDER BY like_count DESC
+        """;
+
+        return findMany(filmRowMapper, popularFilmQ, userId, friendId);
+    }
 }

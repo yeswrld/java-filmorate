@@ -77,11 +77,17 @@ public class FilmController {
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable Integer id,
-                           @PathVariable Integer userId) {
+                          @PathVariable Integer userId) {
         log.info("Удаляем лайк у фильма {} от пользователя {}", id, userId);
         filmService.deleteLike(id, userId);
         log.info("Лайк успешно удален");
     }
 
+    @GetMapping("/common")
+    public Collection<Film> getCommon(@RequestParam Integer userId,
+                                      @RequestParam Integer friendId) {
+        log.info("Общие фильмы у userId={} с friendId={}", userId, friendId);
+        return filmService.getCommon(userId, friendId);
+    }
 }
 
