@@ -55,7 +55,7 @@ public class DirectorDbStorageImplementation implements DirectorDbStorage {
 
     @Override
     public void removeById(Integer id) {
-        String removeDirectorsQ1 = "DELETE DIRECTOR_ID FROM FILMS WHERE DIRECTOR_ID = ?";
+        String removeDirectorsQ1 = "UPDATE FILMS SET DIRECTOR_ID = null WHERE DIRECTOR_ID = ?";
         jdbc.update(removeDirectorsQ1, id);
         String removeDirectorsQ = "DELETE FROM DIRECTORS WHERE ID = ?";
         jdbc.update(removeDirectorsQ, id);

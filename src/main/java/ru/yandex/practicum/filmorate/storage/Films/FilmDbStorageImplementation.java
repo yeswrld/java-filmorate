@@ -49,19 +49,17 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
     @Override
     public Collection<Film> findAll() {
         String findAllQ = """
-        SELECT f.*,
-        d.name as DIRECTOR_NAME
-        FROM films f
-        LEFT JOIN directors d ON f.director_id = d.id
-        """;
+                SELECT f.*,
+                d.name as DIRECTOR_NAME
+                FROM films f
+                LEFT JOIN directors d ON f.director_id = d.id
+                """;
         return findMany(filmRowMapper, findAllQ);
     }
 
     @Override
     public Film create(Film film) {
-        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbc)
-                .withTableName("FILMS")
-                .usingGeneratedKeyColumns("ID");
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbc).withTableName("FILMS").usingGeneratedKeyColumns("ID");
         Map<String, Object> param = new HashMap<>();
         param.put("name", film.getName());
         param.put("description", film.getDescription());
@@ -83,26 +81,13 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
     public Film update(Film newFilm) {
         if (newFilm.getDirectors() == null || newFilm.getDirectors().isEmpty()) {
             String updQ = "UPDATE FILMS SET NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, MPA_ID = ?, DIRECTOR_ID = null WHERE ID = ?";
-            jdbc.update(updQ,
-                    newFilm.getName(),
-                    newFilm.getDescription(),
-                    newFilm.getReleaseDate(),
-                    newFilm.getDuration(),
-                    newFilm.getMpa().getId(),
-                    newFilm.getId()
+            jdbc.update(updQ, newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration(), newFilm.getMpa().getId(), newFilm.getId()
 
             );
         } else {
 
             String updQ = "UPDATE FILMS SET NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, MPA_ID = ?, DIRECTOR_ID = ? WHERE ID = ?";
-            jdbc.update(updQ,
-                    newFilm.getName(),
-                    newFilm.getDescription(),
-                    newFilm.getReleaseDate(),
-                    newFilm.getDuration(),
-                    newFilm.getMpa().getId(),
-                    newFilm.getDirectors().getFirst().getId(),
-                    newFilm.getId()
+            jdbc.update(updQ, newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration(), newFilm.getMpa().getId(), newFilm.getDirectors().getFirst().getId(), newFilm.getId()
 
             );
         }
@@ -227,34 +212,13 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
         String sql;
         Object[] params;
         if (by.equalsIgnoreCase("title")) {
-            sql = "SELECT f.*, mpa.*, " +
-                    "       NULL as director_id, " +
-                    "       NULL as director_name " +
-                    "FROM films f " +
-                    "JOIN mpa ON f.mpa_id = mpa.id " +
-                    "WHERE LOWER(f.name) LIKE LOWER(CONCAT('%', ?, '%')) " +
-                    "ORDER BY (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) DESC";
+            sql = "SELECT f.*, mpa.*, " + "       NULL as director_id, " + "       NULL as director_name " + "FROM films f " + "JOIN mpa ON f.mpa_id = mpa.id " + "WHERE LOWER(f.name) LIKE LOWER(CONCAT('%', ?, '%')) " + "ORDER BY (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) DESC";
             params = new Object[]{query};
         } else if (by.equalsIgnoreCase("director")) {
-            sql = "SELECT f.*, mpa.*, " +
-                    "       d.id as director_id, " +
-                    "       d.name as director_name " +
-                    "FROM films f " +
-                    "JOIN mpa ON f.mpa_id = mpa.id " +
-                    "JOIN directors d ON f.DIRECTOR_ID = d.id " +
-                    "WHERE LOWER(d.name) LIKE LOWER(CONCAT('%', ?, '%')) " +
-                    "ORDER BY (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) DESC";
+            sql = "SELECT f.*, mpa.*, " + "       d.id as director_id, " + "       d.name as director_name " + "FROM films f " + "JOIN mpa ON f.mpa_id = mpa.id " + "JOIN directors d ON f.DIRECTOR_ID = d.id " + "WHERE LOWER(d.name) LIKE LOWER(CONCAT('%', ?, '%')) " + "ORDER BY (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) DESC";
             params = new Object[]{query};
         } else if (by.equalsIgnoreCase("director,title") || by.equalsIgnoreCase("title,director")) {
-            sql = "SELECT f.*, mpa.*, " +
-                    "       d.id as director_id, " +
-                    "       d.name as director_name " +
-                    "FROM films f " +
-                    "JOIN mpa ON f.mpa_id = mpa.id " +
-                    "LEFT JOIN directors d ON f.DIRECTOR_ID = d.id " +
-                    "WHERE LOWER(f.name) LIKE LOWER(CONCAT('%', ?, '%')) " +
-                    "   OR LOWER(d.name) LIKE LOWER(CONCAT('%', ?, '%')) " +
-                    "ORDER BY (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) DESC";
+            sql = "SELECT f.*, mpa.*, " + "       d.id as director_id, " + "       d.name as director_name " + "FROM films f " + "JOIN mpa ON f.mpa_id = mpa.id " + "LEFT JOIN directors d ON f.DIRECTOR_ID = d.id " + "WHERE LOWER(f.name) LIKE LOWER(CONCAT('%', ?, '%')) " + "   OR LOWER(d.name) LIKE LOWER(CONCAT('%', ?, '%')) " + "ORDER BY (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) DESC";
             params = new Object[]{query, query};
         } else {
             throw new IllegalArgumentException("Некорректное значение параметра by");
