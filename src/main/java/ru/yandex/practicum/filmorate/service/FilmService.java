@@ -44,8 +44,7 @@ public class FilmService {
 
     public Film update(Film film) {
         filmValidateForUpdate(film);
-        Film newfilm = distinctGenre(film);
-        Film updFilm = filmDbStorage.update(newfilm);
+        Film updFilm = filmDbStorage.update(film);
         return updFilm;
     }
 
