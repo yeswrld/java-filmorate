@@ -139,7 +139,11 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
 
     @Override
     public Collection<Film> popularWithParams(Integer count, String genreId, String year) {
-        String popularFilmQ = """
+        Collection<Film> films;
+
+        String popularFilmQ = "";
+        if (!genreId.equals("%")) {
+            popularFilmQ = """
                 SELECT f.*,
                        mpa.*,
                        d.name as DIRECTOR_NAME,
@@ -152,8 +156,24 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
                        ORDER BY like_count DESC
                        LIMIT ?
                 """;
+            films = findMany(filmRowMapper, popularFilmQ, genreId, year, count);
+        } else {
+            popularFilmQ = """
+                SELECT f.*,
+                       mpa.*,
+                       d.name as DIRECTOR_NAME,
+                       (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) as like_count
+                       FROM films f
+                       JOIN mpa ON f.mpa_id = mpa.id
+                       LEFT JOIN directors d ON f.director_id = d.id
+                       WHERE FORMATDATETIME(f.RELEASE_DATE, 'YYYY') LIKE ?
+                       ORDER BY like_count DESC
+                       LIMIT ?
+                """;
+            films = findMany(filmRowMapper, popularFilmQ, year, count);
+        }
 
-        return findMany(filmRowMapper, popularFilmQ, genreId, year, count);
+        return films;
     }
 
     private void updateGenres(Film film) {
