@@ -54,8 +54,8 @@ public class DirectorService {
         }
     }
 
-   public void validateDirector(Director director) {
-        if(director.getName() == null || director.getName().isBlank()) {
+    public void validateDirector(Director director) {
+        if (director.getName() == null || director.getName().isBlank()) {
             log.info("Нельзя создать: Имя режиссера не заданно");
             throw new ValidationException("Нельзя создать: Имя режиссера не заданно");
         }
