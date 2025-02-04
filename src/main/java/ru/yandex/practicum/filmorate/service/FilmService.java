@@ -168,7 +168,7 @@ public class FilmService {
     }
 
     private Film distinctGenre(Film film) {
-        if(film.getGenres() != null) {
+        if (film.getGenres() != null) {
             film.setGenres(film.getGenres().stream()
                     .distinct()
                     .collect(Collectors.toList()));
