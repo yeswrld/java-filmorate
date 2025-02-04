@@ -101,6 +101,7 @@ public class UserDbStorageImplemetation extends BaseStorage<User> implements Use
                 SELECT u.* FROM USERS u
                 JOIN FRIENDS f ON u.id = f.FRIEND_ID
                 WHERE F.USER_ID  = ?
+                ORDER BY U.ID ASC
                 """;
         return findMany(userRowMapper, getFriendsQ, id);
     }

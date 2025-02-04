@@ -92,7 +92,7 @@ public class UserService {
 
     public Set<User> getFriends(Integer id) {
         userInDbExist(id);
-        return Set.copyOf(userDbStorage.getFriends(id));
+        return Set.copyOf(userDbStorage.getFriends(id).reversed());
     }
 
     public void addFriend(Integer userA, Integer userB) {
