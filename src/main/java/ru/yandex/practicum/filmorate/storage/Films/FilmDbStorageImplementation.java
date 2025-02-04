@@ -4,7 +4,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.service.GenreService;
@@ -31,7 +30,13 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
 
     @Override
     public Optional<Film> findById(Integer id) {
-        String findById = "SELECT ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA_ID, DIRECTOR_ID FROM FILMS WHERE  ID = ?";
+        String findById = """
+                SELECT f.*,
+                d.name as DIRECTOR_NAME
+                FROM films f
+                LEFT JOIN directors d ON f.director_id = d.id
+                WHERE f.ID = ?
+                """;
         try {
             Film result = findOne(filmRowMapper, findById, id);
             return Optional.ofNullable(result);
@@ -43,7 +48,12 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
 
     @Override
     public Collection<Film> findAll() {
-        String findAllQ = "SELECT * from FILMS";
+        String findAllQ = """
+        SELECT f.*,
+        d.name as DIRECTOR_NAME
+        FROM films f
+        LEFT JOIN directors d ON f.director_id = d.id
+        """;
         return findMany(filmRowMapper, findAllQ);
     }
 
@@ -72,22 +82,30 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
     @Override
     public Film update(Film newFilm) {
         if (newFilm.getDirectors() == null || newFilm.getDirectors().isEmpty()) {
-            newFilm.setDirectors(List.of(Director.builder()
-                    .id(null)
-                    .build()));
+            String updQ = "UPDATE FILMS SET NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, MPA_ID = ?, DIRECTOR_ID = null WHERE ID = ?";
+            jdbc.update(updQ,
+                    newFilm.getName(),
+                    newFilm.getDescription(),
+                    newFilm.getReleaseDate(),
+                    newFilm.getDuration(),
+                    newFilm.getMpa().getId(),
+                    newFilm.getId()
+
+            );
+        } else {
+
+            String updQ = "UPDATE FILMS SET NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, MPA_ID = ?, DIRECTOR_ID = ? WHERE ID = ?";
+            jdbc.update(updQ,
+                    newFilm.getName(),
+                    newFilm.getDescription(),
+                    newFilm.getReleaseDate(),
+                    newFilm.getDuration(),
+                    newFilm.getMpa().getId(),
+                    newFilm.getDirectors().getFirst().getId(),
+                    newFilm.getId()
+
+            );
         }
-
-        String updQ = "UPDATE FILMS SET NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, MPA_ID = ?, DIRECTOR_ID = ? WHERE ID = ?";
-        jdbc.update(updQ,
-                newFilm.getName(),
-                newFilm.getDescription(),
-                newFilm.getReleaseDate(),
-                newFilm.getDuration(),
-                newFilm.getMpa().getId(),
-                newFilm.getDirectors().getFirst().getId(),
-                newFilm.getId()
-
-        );
         updateGenres(newFilm);
         return newFilm;
     }
@@ -178,10 +196,13 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
     public Collection<Film> sortedDirectorID(Integer directorId) {
         String filmQ = """
                 SELECT f.*,
+                d.name as DIRECTOR_NAME
                 FROM films f
+                LEFT JOIN directors d ON f.director_id = d.id
                 WHERE f.DIRECTOR_ID = ?
                 """;
         List<Film> films = findMany(filmRowMapper, filmQ, directorId);
+
         return films;
     }
 

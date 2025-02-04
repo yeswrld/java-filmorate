@@ -31,6 +31,7 @@ public class DirectorService {
 
     public Director create(Director director) {
         validateDirector(director);
+        log.info("Режиссер создан");
         return directorDbStorage.create(director);
     }
 
@@ -40,6 +41,7 @@ public class DirectorService {
             throw new NotFoundException("Режиссер не найден");
         } else {
             return directorDbStorage.update(newDirector);
+
         }
     }
 
@@ -52,7 +54,7 @@ public class DirectorService {
         }
     }
 
-    private void validateDirector(Director director) {
+   public void validateDirector(Director director) {
         if(director.getName() == null || director.getName().isBlank()) {
             log.info("Нельзя создать: Имя режиссера не заданно");
             throw new ValidationException("Нельзя создать: Имя режиссера не заданно");
