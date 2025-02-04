@@ -138,6 +138,7 @@ public class FilmService {
 
 
     public Collection<Film> sortedDirectorID(Integer directorID, String sorBy) {
+        log.info("Выводим список фильмов отсортированных по режиссеру");
         Comparator<Film> explicitComparator2 = (film1, film2) -> film1.getLikes().size() - film2.getLikes().size();
         Comparator<Film> explicitComparator = (film1, film2) -> film1.getReleaseDate().compareTo(film2.getReleaseDate());
         Collection<Film> films = filmDbStorage.sortedDirectorID(directorID);
