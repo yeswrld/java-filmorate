@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.Directors.DirectorDbStorage;
 
@@ -29,6 +30,8 @@ public class DirectorService {
     }
 
     public Director create(Director director) {
+        validateDirector(director);
+        log.info("Режиссер создан");
         return directorDbStorage.create(director);
     }
 
@@ -38,6 +41,7 @@ public class DirectorService {
             throw new NotFoundException("Режиссер не найден");
         } else {
             return directorDbStorage.update(newDirector);
+
         }
     }
 
@@ -47,6 +51,13 @@ public class DirectorService {
             throw new NotFoundException("Режиссер не найден");
         } else {
             directorDbStorage.removeById(id);
+        }
+    }
+
+    public void validateDirector(Director director) {
+        if (director.getName() == null || director.getName().isBlank()) {
+            log.info("Нельзя создать: Имя режиссера не заданно");
+            throw new ValidationException("Нельзя создать: Имя режиссера не заданно");
         }
     }
 }

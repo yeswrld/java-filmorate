@@ -30,6 +30,7 @@ public class FilmService {
     private final MpaService mpaService;
     private final UserService userService;
     private final EventDbStorage eventDbStorage;
+    private final DirectorService directorService;
 
     public Collection<Film> findAll() {
         return filmDbStorage.findAll();
@@ -145,6 +146,8 @@ public class FilmService {
 
 
     public Collection<Film> sortedDirectorID(Integer directorID, String sorBy) {
+        directorService.findById(directorID);
+        log.info("Выводим список фильмов отсортированных по режиссеру");
         Comparator<Film> explicitComparator2 = (film1, film2) -> film1.getLikes().size() - film2.getLikes().size();
         Comparator<Film> explicitComparator = (film1, film2) -> film1.getReleaseDate().compareTo(film2.getReleaseDate());
         Collection<Film> films = filmDbStorage.sortedDirectorID(directorID);
@@ -169,5 +172,14 @@ public class FilmService {
 
     public Collection<Film> searchFilms(String query, String by) {
         return filmDbStorage.searchFilms(query, by);
+    }
+
+    private Film distinctGenre(Film film) {
+        if (film.getGenres() != null) {
+            film.setGenres(film.getGenres().stream()
+                    .distinct()
+                    .collect(Collectors.toList()));
+        }
+        return film;
     }
 }
