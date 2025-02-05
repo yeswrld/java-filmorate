@@ -13,10 +13,7 @@ import ru.yandex.practicum.filmorate.storage.Events.EventDbStorage;
 import ru.yandex.practicum.filmorate.storage.Users.UserDbStorage;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -90,9 +87,9 @@ public class UserService {
         userDbStorage.deleteUser(id);
     }
 
-    public Set<User> getFriends(Integer id) {
+    public List<User> getFriends(Integer id) {
         userInDbExist(id);
-        return Set.copyOf(userDbStorage.getFriends(id).reversed());
+        return userDbStorage.getFriends(id);
     }
 
     public void addFriend(Integer userA, Integer userB) {
