@@ -40,6 +40,15 @@ public class FilmService {
     }
 
     public Film update(Film film) {
+        if (film.getGenres() != null) {
+            List<Genre> genres = new ArrayList<>();
+            for (int i = 0; i < film.getGenres().size(); i++) {
+                if (!genres.contains(film.getGenres().get(i))) {
+                    genres.add(film.getGenres().get(i));
+                }
+            }
+            film.setGenres(genres);
+        }
         Film updFilm = filmValidateForUpdate(film);
         filmDbStorage.update(film);
         return updFilm;
@@ -123,6 +132,9 @@ public class FilmService {
         } else oldFilm.setDuration(film.getDuration());
         if (!mpaService.mpaExists(film.getMpa().getId())) {
             oldFilm.setMpa(film.getMpa());
+        }
+        if (film.getGenres() == null) {
+            film.setGenres(Collections.EMPTY_LIST);
         }
         if (film.getGenres() != null) {
             LinkedHashSet<Genre> set = new LinkedHashSet<>(film.getGenres());
