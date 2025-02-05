@@ -35,14 +35,13 @@ public class EventDbStorageImplementation extends BaseStorage<Event> implements 
         param.put("eventType", eventType.name());
         param.put("operation", operation.name());
         param.put("entityId", entityId);
-        simpleJdbcInsert.execute(param);
+        Number eventId = simpleJdbcInsert.executeAndReturnKey(param);
+        System.out.println("Inserted event with id: " + eventId);
     }
 
     @Override
     public List<Event> getAll(Integer userId) {
-        String getEventsQ = """
-                SELECT * FROM EVENTS WHERE userId = ?
-                """;
+        String getEventsQ = "SELECT eventId, timestamp, userId, eventType, operation, entityId FROM EVENTS WHERE userId = ? ORDER BY timestamp ASC";
         return findMany(eventsRowMapper, getEventsQ, userId);
     }
 }

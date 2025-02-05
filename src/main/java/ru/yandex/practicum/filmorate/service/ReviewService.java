@@ -37,8 +37,11 @@ public class ReviewService {
 
     public Review update(Review review) {
         validateReview(review);
-        reviewDbStorage.findById(review.getReviewId()).orElseThrow(() -> new NotFoundException("Отзыв не найден"));
-        eventDbStorage.add(EventType.REVIEW, EventOperation.UPDATE, review.getUserId(), review.getReviewId());
+        Review existing = reviewDbStorage.findById(review.getReviewId())
+                .orElseThrow(() -> new NotFoundException("Отзыв не найден"));
+        review.setUserId(existing.getUserId());
+        review.setFilmId(existing.getFilmId());
+        eventDbStorage.add(EventType.REVIEW, EventOperation.UPDATE, existing.getUserId(), review.getReviewId());
         return reviewDbStorage.update(review);
     }
 

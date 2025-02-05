@@ -81,16 +81,12 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
     public Film update(Film newFilm) {
         if (newFilm.getDirectors() == null || newFilm.getDirectors().isEmpty()) {
             String updQ = "UPDATE FILMS SET NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, MPA_ID = ?, DIRECTOR_ID = null WHERE ID = ?";
-            jdbc.update(updQ, newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration(), newFilm.getMpa().getId(), newFilm.getId()
-
-            );
+            jdbc.update(updQ, newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration(), newFilm.getMpa().getId(), newFilm.getId());
         } else {
-
             String updQ = "UPDATE FILMS SET NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, MPA_ID = ?, DIRECTOR_ID = ? WHERE ID = ?";
-            jdbc.update(updQ, newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration(), newFilm.getMpa().getId(), newFilm.getDirectors().getFirst().getId(), newFilm.getId()
-
-            );
+            jdbc.update(updQ, newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration(), newFilm.getMpa().getId(), newFilm.getDirectors().get(0).getId(), newFilm.getId());
         }
+
         updateGenres(newFilm);
         return newFilm;
     }

@@ -37,12 +37,8 @@ public class FilmRowMapper implements RowMapper<Film> {
         } else {
             Director director = Director.builder()
                     .id(rs.getInt("DIRECTOR_ID"))
+                    .name(rs.getString("DIRECTOR_NAME"))
                     .build();
-            try {
-                director.setName(rs.getString("DIRECTOR_NAME"));
-            } catch (Exception e) {
-                director.setName(null);
-            }
             film.setDirectors(List.of(director));
         }
         return film;

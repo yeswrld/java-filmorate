@@ -13,10 +13,7 @@ import ru.yandex.practicum.filmorate.storage.Events.EventDbStorage;
 import ru.yandex.practicum.filmorate.storage.Films.FilmDbStorage;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -103,13 +100,8 @@ public class FilmService {
             throw new NotFoundException("Не корректный МРА");
         }
         if (film.getGenres() != null) {
-            List<Genre> genres = new ArrayList<>();
-            for (int i = 0; i < film.getGenres().size(); i++) {
-                if (!genres.contains(film.getGenres().get(i))) {
-                    genres.add(film.getGenres().get(i));
-                }
-            }
-            film.setGenres(genres);
+            LinkedHashSet<Genre> set = new LinkedHashSet<>(film.getGenres());
+            film.setGenres(List.copyOf(set));
             film.getGenres().forEach(genre -> genreService.genreCheck(genre.getId()));
         }
         return film;
@@ -133,13 +125,8 @@ public class FilmService {
             oldFilm.setMpa(film.getMpa());
         }
         if (film.getGenres() != null) {
-            List<Genre> genres = new ArrayList<>();
-            for (int i = 0; i < film.getGenres().size(); i++) {
-                if (!genres.contains(film.getGenres().get(i))) {
-                    genres.add(film.getGenres().get(i));
-                }
-            }
-            oldFilm.setGenres(genres);
+            LinkedHashSet<Genre> set = new LinkedHashSet<>(film.getGenres());
+            oldFilm.setGenres(List.copyOf(set));
         }
         return oldFilm;
     }
