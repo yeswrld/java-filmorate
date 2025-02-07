@@ -8,7 +8,7 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Event.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.RecommendationService;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
@@ -21,7 +21,7 @@ import java.util.Set;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
-    private final RecommendationService recommendationService;
+    private final FilmService filmService;
 
     @GetMapping
     public Collection<User> findAll() {
@@ -88,7 +88,7 @@ public class UserController {
     @GetMapping("/{id}/recommendations")
     public List<Film> getRecommendations(@PathVariable Integer id) {
         log.info("Получен запрос рекомендаций для пользователя с ИД = {}", id);
-        return recommendationService.getRecommendations(id);
+        return filmService.getRecommended(id);
     }
 
     @GetMapping("/{id}/feed")

@@ -137,6 +137,62 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
     }
 
     @Override
+    public List<Film> recommendedFilms(Integer id) {
+        String recomQ = """
+                WITH TargetUserLikes AS (
+                    SELECT
+                        film_id
+                    FROM
+                        likes
+                    WHERE
+                        user_id = ? -- Переданный ID целевого пользователя
+                ),
+                MaxSimilarUser AS (
+                    SELECT
+                        l.user_id AS similar_user_id,
+                        COUNT(*) AS common_likes_count
+                    FROM
+                        likes l
+                    JOIN
+                        TargetUserLikes tul
+                    ON
+                        l.film_id = tul.film_id AND l.user_id != ?
+                    GROUP BY
+                        l.user_id
+                    ORDER BY
+                        common_likes_count DESC
+                    LIMIT 1 -- Выбираем пользователя с максимальным количеством общих лайков
+                ),
+                Recommendations AS (
+                    SELECT DISTINCT
+                        msu.similar_user_id,
+                        l.film_id
+                    FROM
+                        MaxSimilarUser msu
+                    JOIN
+                        likes l
+                    ON
+                        msu.similar_user_id = l.user_id
+                    WHERE
+                        NOT EXISTS (
+                            SELECT 1
+                            FROM TargetUserLikes tul
+                            WHERE tul.film_id = l.film_id
+                        )
+                )
+                SELECT
+                    f.*
+                FROM
+                    Recommendations r
+                JOIN
+                    films f
+                ON
+                    r.film_id = f.id;
+                """;
+        return jdbc.query(recomQ, filmRowMapper, id, id);
+    }
+
+    @Override
     public Collection<Film> popularWithParams(Integer count, String genreId, String year) {
         Collection<Film> films;
 
@@ -228,13 +284,29 @@ public class FilmDbStorageImplementation extends BaseStorage<Film> implements Fi
         String sql;
         Object[] params;
         if (by.equalsIgnoreCase("title")) {
-            sql = "SELECT f.*, mpa.*, " + "       NULL as director_id, " + "       NULL as director_name " + "FROM films f " + "JOIN mpa ON f.mpa_id = mpa.id " + "WHERE LOWER(f.name) LIKE LOWER(CONCAT('%', ?, '%')) " + "ORDER BY (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) DESC";
+            sql = """
+                    SELECT f.*, mpa.*, NULL as director_id, NULL as director_name
+                    FROM films f JOIN mpa ON f.mpa_id = mpa.id
+                    WHERE LOWER(f.name) LIKE LOWER(CONCAT('%', ?, '%'))
+                    ORDER BY (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) DESC
+                    """;
             params = new Object[]{query};
         } else if (by.equalsIgnoreCase("director")) {
-            sql = "SELECT f.*, mpa.*, " + "       d.id as director_id, " + "       d.name as director_name " + "FROM films f " + "JOIN mpa ON f.mpa_id = mpa.id " + "JOIN directors d ON f.DIRECTOR_ID = d.id " + "WHERE LOWER(d.name) LIKE LOWER(CONCAT('%', ?, '%')) " + "ORDER BY (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) DESC";
+            sql = """
+                    SELECT f.*, mpa.*, d.id as director_id, d.name as director_name
+                    FROM films f JOIN mpa ON f.mpa_id = mpa.id JOIN directors d ON f.DIRECTOR_ID = d.id
+                    WHERE LOWER(d.name) LIKE LOWER(CONCAT('%', ?, '%'))
+                    ORDER BY (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) DESC
+                    """;
             params = new Object[]{query};
         } else if (by.equalsIgnoreCase("director,title") || by.equalsIgnoreCase("title,director")) {
-            sql = "SELECT f.*, mpa.*, " + "       d.id as director_id, " + "       d.name as director_name " + "FROM films f " + "JOIN mpa ON f.mpa_id = mpa.id " + "LEFT JOIN directors d ON f.DIRECTOR_ID = d.id " + "WHERE LOWER(f.name) LIKE LOWER(CONCAT('%', ?, '%')) " + "   OR LOWER(d.name) LIKE LOWER(CONCAT('%', ?, '%')) " + "ORDER BY (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) DESC";
+            sql = """
+                    SELECT f.*, mpa.*, d.id as director_id, d.name as director_name
+                    FROM films f JOIN mpa ON f.mpa_id = mpa.id
+                    LEFT JOIN directors d ON f.DIRECTOR_ID = d.id
+                    WHERE LOWER(f.name) LIKE LOWER(CONCAT('%', ?, '%')) OR LOWER(d.name) LIKE LOWER(CONCAT('%', ?, '%'))
+                    ORDER BY (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) DESC
+                    """;
             params = new Object[]{query, query};
         } else {
             throw new IllegalArgumentException("Некорректное значение параметра by");

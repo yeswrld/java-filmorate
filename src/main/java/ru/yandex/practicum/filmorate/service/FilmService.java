@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.Events.EventDbStorage;
 import ru.yandex.practicum.filmorate.storage.Films.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.Likes.LikesDbStorage;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -28,6 +29,7 @@ public class FilmService {
     private final UserService userService;
     private final EventDbStorage eventDbStorage;
     private final DirectorService directorService;
+    private final LikesDbStorage likesDbStorage;
 
     public Collection<Film> findAll() {
         return filmDbStorage.findAll();
@@ -141,6 +143,14 @@ public class FilmService {
             oldFilm.setGenres(List.copyOf(set));
         }
         return oldFilm;
+    }
+
+    public List<Film> getRecommended(int userId) {
+        userService.userInDbExist(userId);
+        if (likesDbStorage.getUsersLikes(userId) == null) {
+            return Collections.emptyList();
+        }
+        return filmDbStorage.recommendedFilms(userId);
     }
 
 
