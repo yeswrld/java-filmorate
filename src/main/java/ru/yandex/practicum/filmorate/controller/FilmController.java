@@ -29,11 +29,18 @@ public class FilmController {
         return filmService.findById(id);
     }
 
-    @GetMapping("/popular")
-    public Collection<Film> findPopular(@RequestParam(name = "count",
-            defaultValue = "10") Integer count) {
-        log.info("Выводим список из {} популярных фильмов", count);
-        return filmService.findPopularFilm(count);
+    @GetMapping(value = "/popular")
+    public Collection<Film> popularWithParams(@RequestParam(name = "count", defaultValue = "10") Integer count,
+                                              @RequestParam(name = "genreId", defaultValue = "%") String genreId,
+                                              @RequestParam(name = "year", defaultValue = "%") String year) {
+        log.info("Выводим список из {} популярных фильмов в жанре id={} за {} год", count, genreId, year);
+        return filmService.popularWithParams(count, genreId, year);
+    }
+
+    @GetMapping("/director/{directorId}")
+    public Collection<Film> sortedDirectors(@PathVariable Integer directorId,
+                                            @RequestParam(name = "sortBy", defaultValue = "%") String sortBy) {
+        return filmService.sortedDirectorID(directorId, sortBy);
     }
 
     @PostMapping
@@ -47,6 +54,7 @@ public class FilmController {
 
     @PutMapping
     public Film update(@RequestBody Film film) {
+
         filmService.update(film);
         return film;
     }
@@ -76,5 +84,16 @@ public class FilmController {
         log.info("Лайк успешно удален");
     }
 
+    @GetMapping("/search")
+    public Collection<Film> searchFilms(@RequestParam String query, @RequestParam String by) {
+        log.info("Поиск фильмов по запросу '{}' по полям '{}'", query, by);
+        return filmService.searchFilms(query, by);
+    }
+
+    @GetMapping("/common")
+    public Collection<Film> getCommon(@RequestParam Integer userId, @RequestParam Integer friendId) {
+        log.info("Общие фильмы у userId={} с friendId={}", userId, friendId);
+        return filmService.getCommon(userId, friendId);
+    }
 }
 

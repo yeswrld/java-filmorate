@@ -5,12 +5,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.Event.EventOperation;
+import ru.yandex.practicum.filmorate.model.Event.EventType;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.storage.Events.EventDbStorage;
 import ru.yandex.practicum.filmorate.storage.Films.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.Likes.LikesDbStorage;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -22,7 +27,9 @@ public class FilmService {
     private final GenreService genreService;
     private final MpaService mpaService;
     private final UserService userService;
-    private final Map<Integer, Film> films = new HashMap<>();
+    private final EventDbStorage eventDbStorage;
+    private final DirectorService directorService;
+    private final LikesDbStorage likesDbStorage;
 
     public Collection<Film> findAll() {
         return filmDbStorage.findAll();
@@ -35,8 +42,17 @@ public class FilmService {
     }
 
     public Film update(Film film) {
-        filmValidateForUpdate(film);
-        Film updFilm = filmDbStorage.update(film);
+        if (film.getGenres() != null) {
+            List<Genre> genres = new ArrayList<>();
+            for (int i = 0; i < film.getGenres().size(); i++) {
+                if (!genres.contains(film.getGenres().get(i))) {
+                    genres.add(film.getGenres().get(i));
+                }
+            }
+            film.setGenres(genres);
+        }
+        Film updFilm = filmValidateForUpdate(film);
+        filmDbStorage.update(film);
         return updFilm;
     }
 
@@ -53,15 +69,21 @@ public class FilmService {
     public void addLike(Integer id, Integer userId) {
         userService.userInDbExist(userId);
         filmDbStorage.setLike(filmDbStorage.findById(id).orElseThrow(() -> new NotFoundException("Фильм не найден")), userId);
+        eventDbStorage.add(EventType.LIKE, EventOperation.ADD, userId, id);
     }
 
     public void deleteLike(Integer id, Integer userId) {
         userService.userInDbExist(userId);
         filmDbStorage.unLike(filmDbStorage.findById(id).orElseThrow(() -> new NotFoundException("Фильм не найден")), userId);
+        eventDbStorage.add(EventType.LIKE, EventOperation.REMOVE, userId, id);
     }
 
     public Collection<Film> findPopularFilm(Integer count) {
         return filmDbStorage.findPopularFilms(count);
+    }
+
+    public Collection<Film> popularWithParams(Integer count, String genreId, String year) {
+        return filmDbStorage.popularWithParams(count, genreId, year);
     }
 
     private Film filmValidate(Film film) {
@@ -89,13 +111,8 @@ public class FilmService {
             throw new NotFoundException("Не корректный МРА");
         }
         if (film.getGenres() != null) {
-            List<Genre> genres = new ArrayList<>();
-            for (int i = 0; i < film.getGenres().size(); i++) {
-                if (!genres.contains(film.getGenres().get(i))) {
-                    genres.add(film.getGenres().get(i));
-                }
-            }
-            film.setGenres(genres);
+            LinkedHashSet<Genre> set = new LinkedHashSet<>(film.getGenres());
+            film.setGenres(List.copyOf(set));
             film.getGenres().forEach(genre -> genreService.genreCheck(genre.getId()));
         }
         return film;
@@ -118,8 +135,60 @@ public class FilmService {
         if (!mpaService.mpaExists(film.getMpa().getId())) {
             oldFilm.setMpa(film.getMpa());
         }
-        oldFilm.setGenres(film.getGenres());
+        if (film.getGenres() == null) {
+            film.setGenres(Collections.EMPTY_LIST);
+        }
+        if (film.getGenres() != null) {
+            LinkedHashSet<Genre> set = new LinkedHashSet<>(film.getGenres());
+            oldFilm.setGenres(List.copyOf(set));
+        }
         return oldFilm;
     }
 
+    public List<Film> getRecommended(int userId) {
+        userService.userInDbExist(userId);
+        if (likesDbStorage.getUsersLikes(userId) == null) {
+            return Collections.emptyList();
+        }
+        return filmDbStorage.recommendedFilms(userId);
+    }
+
+
+    public Collection<Film> sortedDirectorID(Integer directorID, String sorBy) {
+        directorService.findById(directorID);
+        log.info("Выводим список фильмов отсортированных по режиссеру");
+        Comparator<Film> explicitComparator2 = (film1, film2) -> film1.getLikes().size() - film2.getLikes().size();
+        Comparator<Film> explicitComparator = (film1, film2) -> film1.getReleaseDate().compareTo(film2.getReleaseDate());
+        Collection<Film> films = filmDbStorage.sortedDirectorID(directorID);
+        if (sorBy.equals("likes")) {
+            return films.stream()
+                    .sorted(explicitComparator2.reversed())
+                    .collect(Collectors.toList());
+        } else if (sorBy.equals("year")) {
+            return films.stream()
+                    .sorted(explicitComparator)
+                    .collect(Collectors.toList());
+        } else {
+            throw new ValidationException("Некоректный параметр сортировки.");
+        }
+
+    }
+
+
+    public Collection<Film> getCommon(Integer userId, Integer friendId) {
+        return filmDbStorage.getCommon(userId, friendId);
+    }
+
+    public Collection<Film> searchFilms(String query, String by) {
+        return filmDbStorage.searchFilms(query, by);
+    }
+
+    private Film distinctGenre(Film film) {
+        if (film.getGenres() != null) {
+            film.setGenres(film.getGenres().stream()
+                    .distinct()
+                    .collect(Collectors.toList()));
+        }
+        return film;
+    }
 }

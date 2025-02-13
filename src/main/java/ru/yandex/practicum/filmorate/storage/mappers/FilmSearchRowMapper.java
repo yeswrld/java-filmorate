@@ -16,7 +16,8 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class FilmRowMapper implements RowMapper<Film> {
+public class FilmSearchRowMapper implements RowMapper<Film> {
+
     private final MpaDbStorage mpaDbStorage;
     private final LikesDbStorage likesDbStorage;
     private final GenreService genreService;
@@ -28,19 +29,22 @@ public class FilmRowMapper implements RowMapper<Film> {
         film.setName(rs.getString("name"));
         film.setDescription(rs.getString("description"));
         film.setReleaseDate(rs.getDate("release_date").toLocalDate());
-        film.setDuration(rs.getInt("DURATION"));
+        film.setDuration(rs.getInt("duration"));
         film.getLikes().addAll(likesDbStorage.getUsersLikes(film.getId()));
-        film.setMpa(mpaDbStorage.get(rs.getInt("MPA_ID")));
+        film.setMpa(mpaDbStorage.get(rs.getInt("mpa_id")));
         film.setGenres(List.copyOf(genreService.findFilmGenres(film.getId())));
-        if (rs.getObject("DIRECTOR_ID", Integer.class) == null) {
-            film.setDirectors(new ArrayList<>());
-        } else {
+
+        Integer directorId = rs.getObject("director_id", Integer.class);
+        if (directorId != null) {
             Director director = Director.builder()
-                    .id(rs.getInt("DIRECTOR_ID"))
-                    .name(rs.getString("DIRECTOR_NAME"))
+                    .id(directorId)
+                    .name(rs.getString("director_name"))
                     .build();
             film.setDirectors(List.of(director));
+        } else {
+            film.setDirectors(new ArrayList<>());
         }
+
         return film;
     }
 }

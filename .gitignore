@@ -1,3 +1,4 @@
+*.DS_Store
 *.class
 *.log
 *.jar
@@ -10,6 +11,7 @@
 hs_err_pid*
 out/
 target/
+src/main/**/application-dev.properties
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

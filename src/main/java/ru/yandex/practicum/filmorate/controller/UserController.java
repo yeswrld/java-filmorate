@@ -5,10 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Event.Event;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -17,6 +21,7 @@ import java.util.Set;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+    private final FilmService filmService;
 
     @GetMapping
     public Collection<User> findAll() {
@@ -31,7 +36,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends")
-    public Set<User> findUserFriends(@PathVariable Integer id) {
+    public List<User> findUserFriends(@PathVariable Integer id) {
         log.info("Получен запрос друзей пользователя {}", id);
         return userService.getFriends(id);
     }
@@ -80,5 +85,16 @@ public class UserController {
         log.info("Пользователи больше не друзья");
     }
 
+    @GetMapping("/{id}/recommendations")
+    public List<Film> getRecommendations(@PathVariable Integer id) {
+        log.info("Получен запрос рекомендаций для пользователя с ИД = {}", id);
+        return filmService.getRecommended(id);
+    }
+
+    @GetMapping("/{id}/feed")
+    public Collection<Event> getFeed(@PathVariable Integer id) {
+        log.info("Получен запрос ленту событий для пользователя с ИД = {}", id);
+        return userService.getFeed(id);
+    }
 
 }
